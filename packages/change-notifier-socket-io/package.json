@@ -1,0 +1,29 @@
+{
+  "name": "@lazyapps/change-notifier-socket-io",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.46.0",
+    "vitest": "^0.34.1"
+  },
+  "type": "module",
+  "dependencies": {
+    "@lazyapps/logger": "workspace:^",
+    "body-parser": "^1.20.2",
+    "cookie": "^0.5.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "socket.io": "^4.7.2",
+    "socketio-jwt": "^4.6.2"
+  }
+}

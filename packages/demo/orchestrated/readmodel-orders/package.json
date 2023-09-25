@@ -1,0 +1,29 @@
+{
+  "name": "@lazyapps/demo-orchestrated-readmodel-orders",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest",
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.46.0",
+    "vitest": "^0.34.1"
+  },
+  "dependencies": {
+    "@lazyapps/bootstrap": "workspace:^",
+    "@lazyapps/change-notification-sender-fetch": "workspace:^",
+    "@lazyapps/command-sender-fetch": "workspace:^",
+    "@lazyapps/eventbus-mqemitter-redis": "workspace:^",
+    "@lazyapps/express": "workspace:^",
+    "@lazyapps/readmodels": "workspace:^",
+    "@lazyapps/readmodelstorage-mongodb": "workspace:^",
+    "isomorphic-fetch": "^3.0.0",
+    "xml-js": "^1.6.11"
+  },
+  "type": "module"
+}

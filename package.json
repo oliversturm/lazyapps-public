@@ -1,0 +1,24 @@
+{
+  "name": "lazyapps",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "pnpm-update": "pnpm --recursive update --latest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oliversturm/lazyapps.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/oliversturm/lazyapps/issues"
+  },
+  "homepage": "https://github.com/oliversturm/lazyapps#readme",
+  "devDependencies": {
+    "vitest": "^0.34.1"
+  },
+  "module": "true"
+}

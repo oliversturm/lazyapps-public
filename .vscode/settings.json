@@ -1,0 +1,50 @@
+{
+  "eslint.workingDirectories": [
+    "packages/aggregatestore-inmemory",
+    "packages/bootstrap",
+    "packages/change-notification-sender-fetch",
+    "packages/change-notifier-socket-io",
+    "packages/command-processor",
+    "packages/command-sender-fetch",
+    "packages/demo/monolith",
+    "packages/demo/orchestrated/change-notifier",
+    "packages/demo/orchestrated/command-processor",
+    "packages/demo/orchestrated/frontend-react",
+    "packages/demo/orchestrated/frontend-svelte",
+    "packages/demo/orchestrated/readmodel-customer",
+    "packages/demo/orchestrated/readmodel-orders",
+    "packages/eventbus-mqemitter-redis",
+    "packages/eventstore-mongodb",
+    "packages/express",
+    "packages/logger",
+    "packages/mqemitter",
+    "packages/readmodels",
+    "packages/readmodelstorage-mongodb"
+  ],
+  "[javascript]": {
+    "editor.formatOnSave": true
+  },
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#c38fc3",
+    "activityBar.background": "#c38fc3",
+    "activityBar.foreground": "#15202b",
+    "activityBar.inactiveForeground": "#15202b99",
+    "activityBarBadge.background": "#e9e9d5",
+    "activityBarBadge.foreground": "#15202b",
+    "commandCenter.border": "#15202b99",
+    "panel.border": "#c38fc3",
+    "sash.hoverBorder": "#c38fc3",
+    "sideBar.border": "#c38fc3",
+    "statusBar.background": "#b16eb1",
+    "statusBar.foreground": "#15202b",
+    "statusBarItem.hoverBackground": "#995399",
+    "statusBarItem.remoteBackground": "#b16eb1",
+    "statusBarItem.remoteForeground": "#15202b",
+    "tab.activeBorder": "#c38fc3",
+    "titleBar.activeBackground": "#b16eb1",
+    "titleBar.activeForeground": "#15202b",
+    "titleBar.inactiveBackground": "#b16eb199",
+    "titleBar.inactiveForeground": "#15202b99"
+  },
+  "peacock.color": "#b16eb1"
+}

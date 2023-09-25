@@ -1,0 +1,22 @@
+{
+  "name": "@lazyapps/demo-orchestrated-change-notifier",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest",
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.46.0",
+    "vitest": "^0.34.1"
+  },
+  "dependencies": {
+    "@lazyapps/bootstrap": "workspace:^",
+    "@lazyapps/change-notifier-socket-io": "workspace:^"
+  },
+  "type": "module"
+}

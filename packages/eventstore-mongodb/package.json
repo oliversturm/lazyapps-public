@@ -1,0 +1,21 @@
+{
+  "name": "@lazyapps/eventstore-mongodb",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.46.0",
+    "vitest": "^0.34.1"
+  },
+  "dependencies": {
+    "@lazyapps/logger": "workspace:^",
+    "mongodb": "^5.7.0"
+  },
+  "type": "module"
+}

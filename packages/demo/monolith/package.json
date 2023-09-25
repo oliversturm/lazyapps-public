@@ -1,0 +1,44 @@
+{
+  "name": "@lazyapps/demo-monolith",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest",
+    "start": "LOG_LEVEL=trace node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.46.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-svelte": "^2.32.4",
+    "prettier": "^3.0.1",
+    "prettier-plugin-svelte": "^3.0.3",
+    "vitest": "^0.34.1"
+  },
+  "dependencies": {
+    "@lazyapps/aggregatestore-inmemory": "workspace:^",
+    "@lazyapps/bootstrap": "workspace:^",
+    "@lazyapps/change-notification-sender-fetch": "workspace:^",
+    "@lazyapps/change-notifier-socket-io": "workspace:^",
+    "@lazyapps/eventbus-mqemitter-redis": "workspace:^",
+    "@lazyapps/eventstore-mongodb": "workspace:^",
+    "@lazyapps/express": "workspace:^",
+    "@lazyapps/logger": "workspace:^",
+    "@lazyapps/mqemitter": "workspace:^",
+    "@lazyapps/readmodelstorage-mongodb": "workspace:^",
+    "@sveltejs/adapter-auto": "^2.1.0",
+    "@sveltejs/kit": "^1.22.4",
+    "@sveltejs/vite-plugin-svelte": "^2.4.4",
+    "mqemitter": "^5.0.0",
+    "nanoid": "^4.0.2",
+    "socket.io-client": "^4.7.2",
+    "svelte": "^4.1.2",
+    "typescript": "^5.1.6",
+    "vite": "^4.4.9",
+    "yup": "^1.2.0"
+  },
+  "type": "module"
+}

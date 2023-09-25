@@ -1,0 +1,33 @@
+{
+	"name": "@lazyapps/demo-orchestrated-frontend-svelte",
+	"version": "0.0.1",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "vitest",
+		"start": "vite dev"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"eslint": "^8.46.0",
+		"eslint-config-prettier": "^9.0.0",
+		"eslint-plugin-svelte": "^2.32.4",
+		"prettier": "^3.0.1",
+		"prettier-plugin-svelte": "^3.0.3",
+		"vitest": "^0.34.1"
+	},
+	"type": "module",
+	"dependencies": {
+		"@sveltejs/adapter-auto": "^2.1.0",
+		"@sveltejs/kit": "^1.22.4",
+		"@sveltejs/vite-plugin-svelte": "^2.4.4",
+		"socket.io-client": "^4.7.2",
+		"svelte": "^4.1.2",
+		"typescript": "^5.1.6",
+		"uuid": "^9.0.0",
+		"vite": "^4.4.9",
+		"yup": "^1.2.0"
+	}
+}
