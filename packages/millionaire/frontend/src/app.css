@@ -2,164 +2,168 @@
 @tailwind components;
 @tailwind utilities;
 
+code {
+    @apply bg-gray-200 p-1 rounded-md;
+}
+
 .mbutton {
-  @apply px-4 py-2 rounded-md;
+    @apply px-4 py-2 rounded-md;
 }
 
 .blue {
-  @apply bg-blue-500 text-white ;
+    @apply bg-blue-500 text-white ;
 }
 
 .blue:disabled {
-  @apply bg-blue-100 text-white ;
+    @apply bg-blue-100 text-white ;
 }
 
 .red {
-  @apply bg-red-500 text-white ;
+    @apply bg-red-500 text-white ;
 }
 
 .red:disabled {
-  @apply bg-red-100 text-white ;
+    @apply bg-red-100 text-white ;
 }
 
 table.admintable {
-  @apply border-collapse border border-gray-200;
+    @apply border-collapse border border-gray-200;
 
-  th {
-    @apply bg-blue-200 p-2;
-  }
+    th {
+        @apply bg-blue-200 p-2;
+    }
 
-  td {
-    @apply px-4 py-2;
-  }
+    td {
+        @apply px-4 py-2;
+    }
 
-  input {
-    @apply border border-gray-200 rounded-md;
-  }
+    input {
+        @apply border border-gray-200 rounded-md;
+    }
 
-  button {
-    @apply px-2 py-1 rounded-md;
-  }
+    button {
+        @apply px-2 py-1 rounded-md;
+    }
 
-  a {
-    @apply text-blue-500 underline hover:text-blue-700;
-  }
+    a {
+        @apply text-blue-500 underline hover:text-blue-700;
+    }
 }
 
 h1 {
-  @apply text-4xl font-bold text-yellow-500 mt-4 mb-2;
+    @apply text-4xl font-bold text-yellow-500 mt-4 mb-2;
 }
 
 button.control {
-  @apply bg-gray-500 px-4 py-2 rounded-md hover:bg-yellow-200 disabled:bg-blue-700 disabled:cursor-not-allowed;
+    @apply bg-gray-500 px-4 py-2 rounded-md hover:bg-yellow-200 disabled:bg-blue-700 disabled:cursor-not-allowed;
 }
 
 button.control.clickedOnce {
-  @apply bg-blue-500 hover:bg-blue-300;
+    @apply bg-blue-500 hover:bg-blue-300;
 }
 
 button.p-red {
-  @apply bg-red-500 px-4 py-2 rounded-md hover:bg-red-300 text-xl font-bold disabled:bg-blue-700 disabled:text-gray-700 disabled:cursor-not-allowed;
+    @apply bg-red-500 px-4 py-2 rounded-md hover:bg-red-300 text-xl font-bold disabled:bg-blue-700 disabled:text-gray-700 disabled:cursor-not-allowed;
 }
 
 button.p-green {
-  @apply bg-green-500 px-4 py-2 rounded-md hover:bg-green-300 text-xl font-bold disabled:bg-blue-700 disabled:text-gray-700 disabled:cursor-not-allowed;
+    @apply bg-green-500 px-4 py-2 rounded-md hover:bg-green-300 text-xl font-bold disabled:bg-blue-700 disabled:text-gray-700 disabled:cursor-not-allowed;
 }
 
 button.p-green.clickedOnce {
-  @apply bg-green-400 hover:bg-green-200;
-  @apply ring-inset ring-4 ring-orange-400;
+    @apply bg-green-400 hover:bg-green-200;
+    @apply ring-inset ring-4 ring-orange-400;
 }
 
 .public-h1 {
-  @apply text-4xl text-center font-bold text-yellow-500 my-6;
+    @apply text-4xl text-center font-bold text-yellow-500 my-6;
 }
 
 .public-large {
-  @apply text-2xl text-center font-bold text-yellow-500 my-4;
+    @apply text-2xl text-center font-bold text-yellow-500 my-4;
 }
 
 .scoreline {
-  @apply text-2xl text-right font-bold text-yellow-500;
+    @apply text-2xl text-right font-bold text-yellow-500;
 }
 
-.scoreline.scored{
-  @apply text-green-500;
+.scoreline.scored {
+    @apply text-green-500;
 }
 
-.scoreline.current{
-  @apply text-red-500;
+.scoreline.current {
+    @apply text-red-500;
 }
 
 input.public {
-  @apply md:text-2xl text-center font-bold my-4;
+    @apply md:text-2xl text-center font-bold my-4;
 }
 
 .question {
-  @apply bg-orange-300 rounded-xl p-4 text-2xl text-center font-bold text-black my-4 mx-4;
+    @apply bg-orange-300 rounded-xl p-4 text-2xl text-center font-bold text-black my-4 mx-4;
 }
 
 .answer {
-  @apply rounded-xl p-2 md:p-4 md:text-2xl text-center font-bold ;
+    @apply rounded-xl p-2 md:p-4 md:text-2xl text-center font-bold ;
 }
 
 .answer.standard {
-  @apply bg-yellow-300 disabled:bg-yellow-100 text-black disabled:text-gray-400;
+    @apply bg-yellow-300 disabled:bg-yellow-100 text-black disabled:text-gray-400;
 }
 
 .answer.correct {
-  @apply bg-green-300 disabled:bg-green-100 text-black disabled:text-gray-400;
+    @apply bg-green-300 disabled:bg-green-100 text-black disabled:text-gray-400;
 }
 
 .answer.wrong {
-  @apply bg-red-300 disabled:bg-red-100 text-black disabled:text-gray-400;
+    @apply bg-red-300 disabled:bg-red-100 text-black disabled:text-gray-400;
 }
 
 .answer.preselected {
-  @apply bg-yellow-200 disabled:bg-yellow-100 text-black disabled:text-gray-400;
-  @apply ring-inset ring-8 ring-orange-400;
+    @apply bg-yellow-200 disabled:bg-yellow-100 text-black disabled:text-gray-400;
+    @apply ring-inset ring-8 ring-orange-400;
 }
 
 .marker {
-  @apply py-1 px-2 rounded-md;
+    @apply py-1 px-2 rounded-md;
 }
 
 .marker.enabled {
-  @apply bg-red-500 text-white;
+    @apply bg-red-500 text-white;
 }
 
 .marker.disabled {
-  @apply bg-red-100 text-gray-400;
+    @apply bg-red-100 text-gray-400;
 }
 
 .marker.order {
-  @apply bg-green-500 text-white;
+    @apply bg-green-500 text-white;
 }
 
 table.results {
-  @apply border-collapse bg-yellow-100;
+    @apply border-collapse bg-yellow-100;
 
-  th {
-    @apply text-xl text-left py-2 px-4 bg-yellow-200;
-  }
+    th {
+        @apply text-xl text-left py-2 px-4 bg-yellow-200;
+    }
 
-  td {
-    @apply text-left text-xl py-2 px-4;
+    td {
+        @apply text-left text-xl py-2 px-4;
+
+        button {
+            @apply hover:text-blue-500 hover:underline;
+        }
+    }
+
+    input {
+        @apply border border-gray-200 rounded-md;
+    }
 
     button {
-      @apply hover:text-blue-500 hover:underline;
+        @apply px-2 py-1 rounded-md;
     }
-  }
 
-  input {
-    @apply border border-gray-200 rounded-md;
-  }
-
-  button {
-    @apply px-2 py-1 rounded-md;
-  }
-
-  a {
-    @apply text-blue-500 underline hover:text-blue-700;
-  }
+    a {
+        @apply text-blue-500 underline hover:text-blue-700;
+    }
 }

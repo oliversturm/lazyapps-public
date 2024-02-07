@@ -18,11 +18,13 @@ services:
       - '443:443'
       - '8080:8080'
     volumes:
-      - /home/sturm/millionaire2-letsencrypt:/letsencrypt
+      - /root/millionaire2-letsencrypt:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock
 
   mongo:
     image: mongo:latest
+    volumes:
+      - /root/millionaire2-mongo:/data/db
 
   redis:
     image: redis:latest
@@ -180,8 +182,8 @@ services:
 
 secrets:
   jwt-secret:
-    file: /home/sturm/millionaire2-secrets/jwt-secret
+    file: /root/millionaire2-secrets/jwt-secret
   username:
-    file: /home/sturm/millionaire2-secrets/username
+    file: /root/millionaire2-secrets/username
   pwdhash:
-    file: /home/sturm/millionaire2-secrets/pwdhash
+    file: /root/millionaire2-secrets/pwdhash

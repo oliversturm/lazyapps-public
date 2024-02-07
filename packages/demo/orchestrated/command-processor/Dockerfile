@@ -14,4 +14,4 @@ WORKDIR /src/packages/demo/orchestrated/command-processor
 
 EXPOSE 80
 
-CMD ["/src/wait-for-it.sh", "-t", "0", "mongo:27017", "--", "/src/wait-for-it.sh", "-t", "0", "redis:6379", "--", "pnpm", "start"]
+CMD ["pnpm", "start"]

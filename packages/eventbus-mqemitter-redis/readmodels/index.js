@@ -1,3 +1,5 @@
+import pRetry from 'p-retry';
+
 import { getLogger } from '@lazyapps/logger';
 import { connect } from '../connect.js';
 
@@ -16,14 +18,21 @@ export const mqEmitterRedis =
       }
     };
 
-    return connect({ host, port })
+    return pRetry(() => connect({ host, port }), {
+      onFailedAttempt: (error) => {
+        log.error(
+          `Attempt ${error.attemptNumber} failed connecting to Redis on port ${port}: '${error}'. Will retry another ${error.retriesLeft} times.`,
+        );
+      },
+      retries: 10,
+    })
       .catch((err) => {
-        log.error(`Failed to connect to event bus on port ${port}: ${err}`);
+        log.error(`Failed to connect to Redis on port ${port}: ${err}`);
       })
       .then((mq) => {
         mq.on('events', ({ payload }, cb) => {
           log.debug(
-            `Received message on topic 'events': ${JSON.stringify(payload)}`
+            `Received message on topic 'events': ${JSON.stringify(payload)}`,
           );
           context.projectionHandler.projectEvent(payload, inReplay);
 
@@ -31,7 +40,7 @@ export const mqEmitterRedis =
         });
         mq.on('__system', ({ payload }, cb) => {
           log.debug(
-            `Received message on topic 'events': ${JSON.stringify(payload)}`
+            `Received message on topic '__system': ${JSON.stringify(payload)}`,
           );
 
           handleSysMessage(payload);

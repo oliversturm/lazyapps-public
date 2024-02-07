@@ -1,19 +1,26 @@
 import { express } from '@lazyapps/express/readmodels/index.js';
 import { mongodb } from '@lazyapps/readmodelstorage-mongodb';
-import { mqEmitterRedis } from '@lazyapps/eventbus-mqemitter-redis/readmodels/index.js';
+import { rabbitMq } from '@lazyapps/eventbus-rabbitmq/readmodels/index.js';
 import { changeNotificationSenderFetch } from '@lazyapps/change-notification-sender-fetch';
 import { start } from '@lazyapps/bootstrap';
 import * as readModels from './readmodels/index.js';
 import { commandSenderFetch } from '@lazyapps/command-sender-fetch';
+import { customizeExpress } from './graphql-server.js';
 
 start({
   readModels: {
-    listener: express({ port: process.env.EXPRESS_PORT || 3005 }),
+    listener: express({
+      port: process.env.EXPRESS_PORT || 3005,
+      customizeExpress,
+    }),
     storage: mongodb({
       url: process.env.MONGO_URL || 'mongodb://127.0.0.1:27017',
       database: process.env.MONGO_DATABASE || 'readmodel-orders',
     }),
-    eventBus: mqEmitterRedis({ host: process.env.REDIS_HOST || '127.0.0.1' }),
+    eventBus: rabbitMq({
+      url: process.env.RABBIT_URL || 'amqp://localhost',
+      pattern: 'events',
+    }),
     changeNotificationSender: changeNotificationSenderFetch({
       url:
         process.env.CHANGENOTIFICATION_FETCH_URL ||

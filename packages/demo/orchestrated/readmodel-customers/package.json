@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "vitest",
-    "start": "node index.js"
+    "start": "node --watch index.js"
   },
   "keywords": [],
   "author": "",
@@ -18,7 +18,7 @@
     "@lazyapps/bootstrap": "workspace:^",
     "@lazyapps/change-notification-sender-fetch": "workspace:^",
     "@lazyapps/command-sender-fetch": "workspace:^",
-    "@lazyapps/eventbus-mqemitter-redis": "workspace:^",
+    "@lazyapps/eventbus-rabbitmq": "workspace:^",
     "@lazyapps/express": "workspace:^",
     "@lazyapps/readmodels": "workspace:^",
     "@lazyapps/readmodelstorage-mongodb": "workspace:^"

@@ -15,6 +15,7 @@ export const runExpress =
     jwtSecret,
     authCookieName,
     credentialsRequired,
+    customizeExpress = () => {},
   }) =>
   (context) => {
     return new Promise((resolve, reject) => {
@@ -58,6 +59,8 @@ export const runExpress =
       }
 
       installHandlers(context, app);
+
+      customizeExpress(context, app);
 
       const server = app.listen(port, interfaceIp || '0.0.0.0');
       server.on('listening', resolve);

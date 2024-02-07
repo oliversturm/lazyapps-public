@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "vitest",
-    "start": "node index.js"
+    "start": "node --watch index.js"
   },
   "keywords": [],
   "author": "",
@@ -17,7 +17,7 @@
   "dependencies": {
     "@lazyapps/aggregatestore-inmemory": "workspace:^",
     "@lazyapps/bootstrap": "workspace:^",
-    "@lazyapps/eventbus-mqemitter-redis": "workspace:^",
+    "@lazyapps/eventbus-rabbitmq": "workspace:^",
     "@lazyapps/eventstore-mongodb": "workspace:^",
     "@lazyapps/express": "workspace:^"
   },

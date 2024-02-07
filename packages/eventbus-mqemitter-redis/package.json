@@ -15,7 +15,8 @@
   },
   "dependencies": {
     "@lazyapps/logger": "workspace:^",
-    "mqemitter-redis": "^5.0.0"
+    "mqemitter-redis": "^5.0.0",
+    "p-retry": "^6.1.0"
   },
   "type": "module"
 }

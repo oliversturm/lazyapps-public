@@ -1,3 +1,5 @@
+import pRetry from 'p-retry';
+
 import { getLogger } from '@lazyapps/logger';
 import { connect } from '../connect.js';
 
@@ -27,9 +29,16 @@ const waitSubscribers =
 export const mqEmitterRedis =
   ({ host = '127.0.0.1', port = 6379 } = {}) =>
   () => {
-    return connect({ host, port })
+    return pRetry(() => connect({ host, port }), {
+      onFailedAttempt: (error) => {
+        log.error(
+          `Attempt ${error.attemptNumber} failed connecting to Redis on port ${port}: '${error}'. Will retry another ${error.retriesLeft} times.`,
+        );
+      },
+      retries: 10,
+    })
       .catch((err) => {
-        log.error(`Failed to connect to event bus on port ${port}: ${err}`);
+        log.error(`Failed to connect to Redis on port ${port}: ${err}`);
       })
       .then(waitSubscribers(1000))
       .then((mq) => {

@@ -13,8 +13,8 @@ services:
   mongo:
     image: mongo:latest
 
-  redis:
-    image: redis:latest
+  rabbit:
+    image: rabbitmq:latest
 
   command-processor:
     build:
@@ -22,11 +22,13 @@ services:
       context: ../../..
     depends_on:
       - mongo
-      - redis
+      - rabbit
+    volumes:
+      - ./command-processor:/src/packages/demo/orchestrated/command-processor
     environment:
       EXPRESS_PORT: '80'
       MONGO_URL: 'mongodb://mongo:27017'
-      REDIS_HOST: 'redis'
+      RABBIT_URL: 'amqp://rabbit'
       LOG_LEVEL: 'trace'
     labels:
       - 'traefik.http.routers.command-processor-orchestrated.rule=Host(`commands.localhost`)'
@@ -37,13 +39,15 @@ services:
       context: ../../..
     depends_on:
       - mongo
-      - redis
+      - rabbit
       - change-notifier
+    volumes:
+      - ./readmodel-customers:/src/packages/demo/orchestrated/readmodel-customers
     environment:
       EXPRESS_PORT: '80'
       MONGO_URL: 'mongodb://mongo:27017'
       MONGO_DATABASE: 'readmodel-customers'
-      REDIS_HOST: 'redis'
+      RABBIT_URL: 'amqp://rabbit'
       CHANGENOTIFICATION_FETCH_URL: 'http://change-notifier/change'
       COMMAND_URL: 'http://command-processor/api/command'
       LOG_LEVEL: 'trace'
@@ -56,23 +60,36 @@ services:
       context: ../../..
     depends_on:
       - mongo
-      - redis
+      - rabbit
       - change-notifier
+    volumes:
+      - ./readmodel-orders:/src/packages/demo/orchestrated/readmodel-orders
     environment:
       EXPRESS_PORT: '80'
       MONGO_URL: 'mongodb://mongo:27017'
       MONGO_DATABASE: 'readmodel-orders'
-      REDIS_HOST: 'redis'
+      RABBIT_URL: 'amqp://rabbit'
       CHANGENOTIFICATION_FETCH_URL: 'http://change-notifier/change'
       COMMAND_URL: 'http://command-processor/api/command'
       LOG_LEVEL: 'trace'
     labels:
       - 'traefik.http.routers.readmodel-orders-orchestrated.rule=Host(`rm-orders.localhost`)'
 
+  readmodel-dotnet:
+    build:
+      dockerfile: ./packages/demo/orchestrated/readmodel-dotnet/Dockerfile
+      context: ../../..
+    depends_on:
+      - rabbit
+    environment:
+      RABBIT_URL: 'amqp://rabbit'
+
   change-notifier:
     build:
       dockerfile: ./packages/demo/orchestrated/change-notifier/Dockerfile
       context: ../../..
+    volumes:
+      - ./change-notifier:/src/packages/demo/orchestrated/change-notifier
     environment:
       EXPRESS_PORT: '80'
       LOG_LEVEL: 'trace'
@@ -88,6 +105,8 @@ services:
       - readmodel-customers
       - readmodel-orders
       - change-notifier
+    volumes:
+      - ./frontend-react/src:/src/packages/demo/orchestrated/frontend-react/src
     environment:
       VITE_RM_CUSTOMERS_URL: 'http://rm-customers.localhost'
       VITE_RM_ORDERS_URL: 'http://rm-orders.localhost'

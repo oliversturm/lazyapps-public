@@ -1,4 +1,5 @@
 import { MongoClient } from 'mongodb';
+import pRetry from 'p-retry';
 
 import { getLogger } from '@lazyapps/logger';
 
@@ -25,10 +26,21 @@ export const mongodb =
 
     const logLocation = user ? host : connectUrl;
 
-    return MongoClient.connect(connectUrl, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    })
+    return pRetry(
+      () =>
+        MongoClient.connect(connectUrl, {
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
+        }),
+      {
+        onFailedAttempt: (error) => {
+          log.error(
+            `Attempt ${error.attemptNumber} failed connecting to MongoDB at ${logLocation}: '${error}'. Will retry another ${error.retriesLeft} times.`,
+          );
+        },
+        retries: 10,
+      },
+    )
       .catch((err) => {
         log.error(`Can't connect to MongoDB at ${logLocation}: ${err}`);
       })

@@ -1,8 +1,8 @@
 import fetch from 'isomorphic-fetch';
 import convert from 'xml-js';
 
-const customersCollectionName = 'orders_customers';
-const ordersCollectionName = 'orders_overview';
+export const customersCollectionName = 'orders_customers';
+export const ordersCollectionName = 'orders_overview';
 
 export default {
   projections: {

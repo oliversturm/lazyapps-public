@@ -1,0 +1,22 @@
+{
+  "name": "@lazyapps/eventbus-rabbitmq",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.46.0",
+    "vitest": "^0.34.1"
+  },
+  "dependencies": {
+    "@lazyapps/logger": "workspace:^",
+    "amqplib": "^0.10.3",
+    "p-retry": "^6.1.0"
+  },
+  "type": "module"
+}

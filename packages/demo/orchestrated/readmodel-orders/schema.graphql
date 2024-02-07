@@ -1,0 +1,20 @@
+type Order {
+  id: String!
+  text: String!
+  value: Float!
+  usdValue: Float
+  usdRate: String
+}
+
+type Customer {
+  id: String!
+  name: String!
+  orders: [Order!]
+}
+
+type Query {
+  orders: [Order!]
+  order(id: String!): Order
+  customers: [Customer!]
+  customer(id: String!): Customer
+}

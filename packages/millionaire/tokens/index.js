@@ -3,15 +3,7 @@ import { express } from '@lazyapps/tokens';
 import bcrypt from 'bcryptjs';
 import fs from 'fs';
 
-// Create PWDHASH using something like this:
-// ➜ node
-// Welcome to Node.js v16.15.0.
-// Type ".help" for more information.
-// > var bcrypt = require('bcryptjs')
-// undefined
-// > btoa(bcrypt.hashSync('testpwd',10))
-// 'JDJhJDEwJElxSGNxOFBvTnZSZHk0NGpVMnF3TXUzN1ZwVmlKMjNaWG1sY3FZcHF3eVlVd3ZDbVBBb29l'
-// >
+// Create PWDHASH using `create-hash.js` in this directory.
 
 const readSecretFiles = (names) =>
   names.map((name) => fs.readFileSync(`/run/secrets/${name}`, 'utf8').trim());
@@ -27,7 +19,12 @@ const getClaims = (input) => {
   if (username !== USERNAME) {
     throw new Error('Invalid username');
   }
-  if (!bcrypt.compareSync(password, atob(PWDHASH))) {
+  if (
+    !bcrypt.compareSync(
+      password,
+      Buffer.from(PWDHASH, 'base64').toString('utf-8'),
+    )
+  ) {
     throw new Error('Invalid password');
   }
 
