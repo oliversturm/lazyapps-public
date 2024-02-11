@@ -83,6 +83,15 @@ services:
       - rabbit
     environment:
       RABBIT_URL: 'amqp://rabbit'
+      DOTNET_WATCH_RESTART_ON_RUDE_EDIT: 1
+    develop:
+      watch:
+        - path: ./readmodel-dotnet
+          action: sync
+          target: /src/packages/demo/orchestrated/readmodel-dotnet
+    labels:
+      - 'traefik.http.routers.readmodel-dotnet-orchestrated.rule=Host(`rm-dotnet.localhost`)'
+      - 'traefik.http.services.readmodel-dotnet-orchestrated.loadbalancer.server.port=8080'
 
   change-notifier:
     build:
