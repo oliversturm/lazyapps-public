@@ -41,7 +41,7 @@
 </script>
 
 <div
-  class="bg-gradient-to-br from-black via-blue-700 to-black h-screen w-screen flex flex-col items-center overflow-auto"
+  class="bg-blue-700 h-screen w-screen flex flex-col items-center overflow-auto"
 >
   {#if $store.isEmpty}
     <div class="public-large">Loading...</div>

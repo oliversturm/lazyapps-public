@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   traefik:
-    image: traefik:latest
+    image: traefik:3.2.1
     command:
       - '--api.insecure=true'
       - '--providers.docker=true'
@@ -111,7 +111,7 @@ services:
       # change notifier listens to /change, so stripping required
       # extra entry for /socket.io -- just one websocket service
       # in this project, so that's easy
-      - 'traefik.http.routers.millionaire-change-notifier.rule=PathPrefix(`/api/change-notifier`, `/socket.io/`)'
+      - 'traefik.http.routers.millionaire-change-notifier.rule=PathPrefix(`/api/change-notifier`) || PathPrefix(`/socket.io/`)'
       - 'traefik.http.routers.millionaire-change-notifier.entrypoints=web'
       - 'traefik.http.middlewares.millionaire-change-notifier-stripprefix.stripprefix.prefixes=/api/change-notifier'
       - 'traefik.http.middlewares.millionaire-change-notifier-stripprefix.stripprefix.forceSlash=false'

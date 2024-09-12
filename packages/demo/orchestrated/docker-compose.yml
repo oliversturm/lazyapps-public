@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   traefik:
-    image: traefik:latest
+    image: traefik:3.2.1
     command: --api.insecure=true --providers.docker
     ports:
       - '80:80'
