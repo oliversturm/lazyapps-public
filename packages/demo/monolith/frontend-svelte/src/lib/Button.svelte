@@ -3,6 +3,8 @@
   const styles = {
     toolbar:
       'bg-orange-400 hover:bg-amber-300 py-1 px-2 mx-1 rounded disabled:bg-gray-200',
+    'toolbar-selected':
+      'bg-amber-300 hover:bg-yellow-500 py-1 px-2 mx-1 rounded disabled:bg-gray-200',
     separate:
       'bg-cyan-400 hover:bg-sky-300 py-2 px-2 mt-4 mr-1 rounded disabled:bg-gray-200',
     inline:
@@ -15,7 +17,7 @@
   export let submit = false;
   export let disabled = false;
   export let text = '';
-  export let target = '#';
+  export let target = null;
 
   $: buttonClass = `${sharedStyles} ${styles[kind]} ${
     disabled ? disabledStyle : ''

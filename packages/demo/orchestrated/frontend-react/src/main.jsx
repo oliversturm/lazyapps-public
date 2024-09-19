@@ -17,9 +17,14 @@ import customerViewSlice from './state/customerView.slice';
 import ordersViewSlice, {
   notifyChanged as ordersViewNotifyChanged,
 } from './state/ordersView.slice';
+import orderConfirmationRequestsViewSlice, {
+  notifyChanged as orderConfirmationRequestsViewNotifyChanged,
+} from './state/orderConfirmationRequestsView.slice';
+
 import navigationSlice, {
   customersView,
   ordersView,
+  orderConfirmationRequestsView,
   customerView,
   orderView,
   aboutView,
@@ -28,6 +33,7 @@ import navigationSlice, {
 const routeMap = {
   [customersView.type]: '/(customers)?',
   [ordersView.type]: '/orders',
+  [orderConfirmationRequestsView.type]: '/orderConfirmationRequests',
   [customerView.type]: '/customer/:id',
   [orderView.type]: '/order/:customerId/:id',
   [aboutView.type]: '/about',
@@ -48,6 +54,7 @@ const store = configureStore({
     customersView: customersViewSlice,
     customerView: customerViewSlice,
     ordersView: ordersViewSlice,
+    orderConfirmationRequestsView: orderConfirmationRequestsViewSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(routingMiddleware),
@@ -77,6 +84,12 @@ const changeNotificationMap = [
     resolverName: 'all',
     actionCreator: ordersViewNotifyChanged,
   },
+  {
+    endpointName: 'orders',
+    readModelName: 'confirmationRequests',
+    resolverName: 'all',
+    actionCreator: orderConfirmationRequestsViewNotifyChanged,
+  },
 ];
 activateChangeNotifier(changeNotifierEndpoint, changeNotificationMap, store);
 
@@ -87,6 +100,7 @@ const aggregates = {
   },
   order: {
     createOrder: 'CREATE',
+    confirmOrder: 'CONFIRM',
   },
 };
 
@@ -110,5 +124,5 @@ root.render(
         <App />
       </ReduxProvider>
     </SystemProvider>
-  </StrictMode>
+  </StrictMode>,
 );

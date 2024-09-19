@@ -20,16 +20,18 @@
         <Th>Text</Th>
         <Th>Value</Th>
         <Th>Customer</Th>
+        <Th>Status</Th>
         <Th>USD Info</Th>
       </Tr>
     </Thead>
     <Tbody>
       {#each $store.data as row}
-        <Tr>
+        <Tr  warn={row.status !== 'confirmed'}>
           <Td>{row.id}</Td>
           <Td>{row.text}</Td>
           <Td>{row.value}</Td>
           <Td>{row.customerName}</Td>
+          <Td warn={row.status !== 'confirmed'}>{row.status}</Td>
           <Td>{JSON.stringify(row.usdInfo, null, 2)}</Td>
         </Tr>
       {/each}

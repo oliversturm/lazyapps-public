@@ -58,13 +58,13 @@ export const rabbitMq = (config) => (context) => {
                   context.projectionHandler.projectEvent(event, inReplay);
                 }
 
-                if (msg.content) {
-                  log.debug(
-                    `Received message on topic '${
-                      msg.fields.routingKey
-                    }': ${msg.content.toString()}`,
-                  );
-                }
+                // if (msg.content) {
+                //   log.debug(
+                //     `Received message on topic '${
+                //       msg.fields.routingKey
+                //     }': ${msg.content.toString()}`,
+                //   );
+                // }
               },
               { noAck: true },
             );

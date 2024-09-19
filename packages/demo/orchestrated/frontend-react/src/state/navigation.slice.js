@@ -5,12 +5,16 @@ const slice = createSlice({
   name: 'navigation',
   initialState: {},
   reducers: {
-    customersView: s => {
+    customersView: (s) => {
       s.currentView = 'customers';
     },
 
-    ordersView: s => {
+    ordersView: (s) => {
       s.currentView = 'orders';
+    },
+
+    orderConfirmationRequestsView: (s) => {
+      s.currentView = 'orderConfirmationRequests';
     },
 
     // Note that the `id` parameter is called that
@@ -21,7 +25,7 @@ const slice = createSlice({
         s.currentView = 'customer';
         s.customerId = id;
       },
-      prepare: customerId => ({
+      prepare: (customerId) => ({
         payload: { id: customerId || uuid() },
       }),
     },
@@ -37,15 +41,21 @@ const slice = createSlice({
         s.orderId = orderId;
         s.customerId = customerId;
       },
-      prepare: customerId => ({ payload: { id: uuid(), customerId } }),
+      prepare: (customerId) => ({ payload: { id: uuid(), customerId } }),
     },
 
-    aboutView: s => {
+    aboutView: (s) => {
       s.currentView = 'about';
     },
   },
 });
 
-export const { customersView, ordersView, customerView, orderView, aboutView } =
-  slice.actions;
+export const {
+  customersView,
+  ordersView,
+  orderConfirmationRequestsView,
+  customerView,
+  orderView,
+  aboutView,
+} = slice.actions;
 export default slice.reducer;

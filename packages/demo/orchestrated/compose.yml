@@ -1,8 +1,6 @@
-version: '3.8'
-
 services:
   traefik:
-    image: traefik:3.2.1
+    image: traefik:3.1.2
     command: --api.insecure=true --providers.docker
     ports:
       - '80:80'
@@ -23,15 +21,18 @@ services:
     depends_on:
       - mongo
       - rabbit
-    volumes:
-      - ./command-processor:/src/packages/demo/orchestrated/command-processor
+    develop:
+      watch:
+        - action: sync
+          path: ./command-processor
+          target: /src/packages/demo/orchestrated/command-processor
+    labels:
+      - 'traefik.http.routers.command-processor-orchestrated.rule=Host(`commands.localhost`)'
     environment:
       EXPRESS_PORT: '80'
       MONGO_URL: 'mongodb://mongo:27017'
       RABBIT_URL: 'amqp://rabbit'
       LOG_LEVEL: 'trace'
-    labels:
-      - 'traefik.http.routers.command-processor-orchestrated.rule=Host(`commands.localhost`)'
 
   readmodel-customers:
     build:
@@ -41,8 +42,13 @@ services:
       - mongo
       - rabbit
       - change-notifier
-    volumes:
-      - ./readmodel-customers:/src/packages/demo/orchestrated/readmodel-customers
+    develop:
+      watch:
+        - action: sync
+          path: ./readmodel-customers
+          target: /src/packages/demo/orchestrated/readmodel-customers
+    labels:
+      - 'traefik.http.routers.readmodel-customers-orchestrated.rule=Host(`rm-customers.localhost`)'
     environment:
       EXPRESS_PORT: '80'
       MONGO_URL: 'mongodb://mongo:27017'
@@ -51,8 +57,6 @@ services:
       CHANGENOTIFICATION_FETCH_URL: 'http://change-notifier/change'
       COMMAND_URL: 'http://command-processor/api/command'
       LOG_LEVEL: 'trace'
-    labels:
-      - 'traefik.http.routers.readmodel-customers-orchestrated.rule=Host(`rm-customers.localhost`)'
 
   readmodel-orders:
     build:
@@ -62,8 +66,13 @@ services:
       - mongo
       - rabbit
       - change-notifier
-    volumes:
-      - ./readmodel-orders:/src/packages/demo/orchestrated/readmodel-orders
+    develop:
+      watch:
+        - action: sync
+          path: ./readmodel-orders
+          target: /src/packages/demo/orchestrated/readmodel-orders
+    labels:
+      - 'traefik.http.routers.readmodel-orders-orchestrated.rule=Host(`rm-orders.localhost`)'
     environment:
       EXPRESS_PORT: '80'
       MONGO_URL: 'mongodb://mongo:27017'
@@ -72,8 +81,6 @@ services:
       CHANGENOTIFICATION_FETCH_URL: 'http://change-notifier/change'
       COMMAND_URL: 'http://command-processor/api/command'
       LOG_LEVEL: 'trace'
-    labels:
-      - 'traefik.http.routers.readmodel-orders-orchestrated.rule=Host(`rm-orders.localhost`)'
 
   readmodel-dotnet:
     build:
@@ -83,18 +90,29 @@ services:
       - rabbit
     environment:
       RABBIT_URL: 'amqp://rabbit'
+      DOTNET_WATCH_RESTART_ON_RUDE_EDIT: 1
+    labels:
+      - 'traefik.http.routers.readmodel-dotnet-orchestrated.rule=Host(`rm-dotnet.localhost`)'
+    develop:
+      watch:
+        - action: sync
+          path: ./readmodel-dotnet
+          target: /src/packages/demo/orchestrated/readmodel-dotnet
 
   change-notifier:
     build:
       dockerfile: ./packages/demo/orchestrated/change-notifier/Dockerfile
       context: ../../..
-    volumes:
-      - ./change-notifier:/src/packages/demo/orchestrated/change-notifier
+    develop:
+      watch:
+        - action: sync
+          path: ./change-notifier
+          target: /src/packages/demo/orchestrated/change-notifier
+    labels:
+      - 'traefik.http.routers.change-notifier-orchestrated.rule=Host(`change-notifier.localhost`)'
     environment:
       EXPRESS_PORT: '80'
       LOG_LEVEL: 'trace'
-    labels:
-      - 'traefik.http.routers.change-notifier-orchestrated.rule=Host(`change-notifier.localhost`)'
 
   frontend-react:
     build:
@@ -105,15 +123,18 @@ services:
       - readmodel-customers
       - readmodel-orders
       - change-notifier
-    volumes:
-      - ./frontend-react/src:/src/packages/demo/orchestrated/frontend-react/src
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend-react/src
+          target: /src/packages/demo/orchestrated/frontend-react/src
+    labels:
+      - 'traefik.http.routers.frontend-react-orchestrated.rule=Host(`react.localhost`)'
     environment:
       VITE_RM_CUSTOMERS_URL: 'http://rm-customers.localhost'
       VITE_RM_ORDERS_URL: 'http://rm-orders.localhost'
       VITE_COMMAND_URL: 'http://commands.localhost/api/command'
       VITE_CHANGENOTIFIER_URL: 'http://change-notifier.localhost'
-    labels:
-      - 'traefik.http.routers.frontend-react-orchestrated.rule=Host(`react.localhost`)'
 
   frontend-svelte:
     build:
@@ -124,12 +145,15 @@ services:
       - readmodel-customers
       - readmodel-orders
       - change-notifier
-    volumes:
-      - ./frontend-svelte/src:/src/packages/demo/orchestrated/frontend-svelte/src
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend-svelte/src
+          target: /src/packages/demo/orchestrated/frontend-svelte/src
+    labels:
+      - 'traefik.http.routers.frontend-svelte-orchestrated.rule=Host(`svelte.localhost`)'
     environment:
       VITE_RM_CUSTOMERS_URL: 'http://rm-customers.localhost'
       VITE_RM_ORDERS_URL: 'http://rm-orders.localhost'
       VITE_COMMAND_URL: 'http://commands.localhost/api/command'
       VITE_CHANGENOTIFIER_URL: 'http://change-notifier.localhost'
-    labels:
-      - 'traefik.http.routers.frontend-svelte-orchestrated.rule=Host(`svelte.localhost`)'

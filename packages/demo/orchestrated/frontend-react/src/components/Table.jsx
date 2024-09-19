@@ -12,12 +12,14 @@ export const Th = React.memo(({ children }) => (
   <th className="p-2">{children}</th>
 ));
 
-export const Tr = React.memo(({ children }) => <tr>{children}</tr>);
+export const Tr = React.memo(({ children, warn }) => (
+  <tr className={warn ? 'bg-amber-100' : ''}>{children}</tr>
+));
 
 export const Tbody = React.memo(({ children }) => (
   <tbody className="bg-sky-50">{children}</tbody>
 ));
 
-export const Td = React.memo(({ children }) => (
-  <td className="py-2 px-4">{children}</td>
+export const Td = React.memo(({ children, warn }) => (
+  <td className={`py-2 px-4 ${warn ? 'bg-red-100' : ''}`}>{children}</td>
 ));
