@@ -3,9 +3,10 @@ import { startReadModels } from '@lazyapps/readmodels';
 import { getLogger } from '@lazyapps/logger';
 import { startSvelteKit } from './svelte.js';
 
-const log = getLogger('BS');
+const log = getLogger('BS', 'INIT');
 
 export function start({
+  correlation: correlationConfig,
   commands,
   readModels,
   changeNotifier,
@@ -14,22 +15,22 @@ export function start({
 }) {
   if (commands) {
     log.debug('Starting command processor');
-    startCommandProcessor(commands);
+    startCommandProcessor(correlationConfig, commands);
   }
   if (readModels) {
     log.debug('Starting read models');
-    startReadModels(readModels);
+    startReadModels(correlationConfig, readModels);
   }
   if (changeNotifier) {
     log.debug('Starting change notifier');
-    changeNotifier.listener();
+    changeNotifier.listener(correlationConfig);
   }
   if (tokens) {
     log.debug('Starting tokens');
-    tokens.listener();
+    tokens.listener(correlationConfig);
   }
   if (svelte) {
     log.debug('Starting SvelteKit frontend');
-    startSvelteKit(svelte);
+    startSvelteKit(correlationConfig, svelte);
   }
 }

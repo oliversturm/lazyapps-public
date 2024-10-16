@@ -1,4 +1,5 @@
 export const initializeContext = (
+  correlationConfig,
   { aggregateStore, eventStore, eventBus, aggregates },
   handleCommand,
 ) =>
@@ -8,10 +9,15 @@ export const initializeContext = (
       aggregateStore,
       eventStore,
       handleCommand,
+      correlationConfig,
     }))
     .then((context) =>
       eventBus().then((eventBus) => ({ ...context, eventBus })),
     )
     // We run a full replay on startup, to get all aggregates
     // up and running. Not a great idea for production.
-    .then((context) => context.eventStore.replay(context).then(() => context));
+    .then((context) =>
+      context.eventStore
+        .replay('INIT' /*correlationId*/)(context)
+        .then(() => context),
+    );

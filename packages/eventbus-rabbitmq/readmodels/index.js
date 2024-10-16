@@ -1,8 +1,6 @@
 import { getLogger } from '@lazyapps/logger';
 import { channelWithExchange } from '../channelWithExchange.js';
 
-const log = getLogger('RM/EB');
-
 export const rabbitMq = (config) => (context) => {
   let inReplay = false;
 
@@ -23,25 +21,28 @@ export const rabbitMq = (config) => (context) => {
   const actualConfig = { ...defaultConfig, ...config };
   const { exchange, pattern } = actualConfig;
 
-  return channelWithExchange(actualConfig, log)
+  const initLog = getLogger('RM/EB/Rabbit', 'INIT');
+
+  return channelWithExchange(actualConfig, initLog)
     .then(({ channel }) =>
       channel.assertQueue('', { exclusive: true }).then((q) =>
         channel
           .bindQueue(q.queue, exchange, pattern)
           .then(() => channel.bindQueue(q.queue, exchange, '__system'))
           .then(() => {
-            log.info(
+            initLog.info(
               `Event bus connected to Rabbit MQ exchange "${exchange}" with pattern "${pattern}"`,
             );
             return channel.consume(
               q.queue,
               (msg) => {
-                if (msg.fields.routingKey.startsWith('__system.')) {
-                  const event = JSON.parse(msg.content.toString());
+                if (msg.fields.routingKey.startsWith('__system')) {
+                  const { correlationId, event } = JSON.parse(
+                    msg.content.toString(),
+                  );
+                  const log = getLogger('RM/EB/Rabbit', correlationId);
                   log.debug(
-                    `Received message on topic '__system': ${JSON.stringify(
-                      event,
-                    )}`,
+                    `Received '__system' event: ${JSON.stringify(event)}`,
                   );
 
                   handleSysMessage(event);
@@ -49,22 +50,20 @@ export const rabbitMq = (config) => (context) => {
                   // must assume that this message
                   // was caught due to the pattern
                   // passed from the outside
-                  const event = JSON.parse(msg.content.toString());
+                  const { correlationId, event } = JSON.parse(
+                    msg.content.toString(),
+                  );
+                  const log = getLogger('RM/EB/Rabbit', correlationId);
                   log.debug(
                     `Received message on topic '${
                       msg.fields.routingKey
                     }': ${JSON.stringify(event)}`,
                   );
-                  context.projectionHandler.projectEvent(event, inReplay);
+                  context.projectionHandler.projectEvent(correlationId)(
+                    event,
+                    inReplay,
+                  );
                 }
-
-                // if (msg.content) {
-                //   log.debug(
-                //     `Received message on topic '${
-                //       msg.fields.routingKey
-                //     }': ${msg.content.toString()}`,
-                //   );
-                // }
               },
               { noAck: true },
             );
@@ -72,6 +71,6 @@ export const rabbitMq = (config) => (context) => {
       ),
     )
     .catch((err) => {
-      log.error(`Failed to bind queue to Rabbit MQ exchange: ${err}`);
+      initLog.error(`Failed to bind queue to Rabbit MQ exchange: ${err}`);
     });
 };

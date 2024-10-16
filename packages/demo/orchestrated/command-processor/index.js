@@ -6,6 +6,9 @@ import { start } from '@lazyapps/bootstrap';
 import * as aggregates from './aggregates/index.js';
 
 start({
+  correlation: {
+    serviceId: 'CMD',
+  },
   commands: {
     receiver: express({ port: process.env.EXPRESS_PORT || 3001 }),
     aggregateStore: inmemory(),

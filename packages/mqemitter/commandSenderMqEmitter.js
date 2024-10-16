@@ -1,23 +1,25 @@
 import { getLogger } from '@lazyapps/logger';
 import { getSharedMqEmitter } from './mqEmitterRegistry.js';
 
-const log = getLogger('RM/CS');
-
 export const commandSenderMqEmitter = ({ mqName }) => {
   return {
-    sendCommand: (content) => {
-      return Promise.resolve(getSharedMqEmitter(mqName))
+    sendCommand: (correlationId, cmd) => {
+      const log = getLogger('RM/CS', correlationId);
+      cmd.correlationId = correlationId;
+      return Promise.resolve(getSharedMqEmitter(correlationId, mqName))
         .then((mq) =>
           mq.emit({
             topic: 'command',
-            payload: content,
-          })
+            payload: cmd,
+          }),
         )
         .then(() => {
-          log.debug(`Sending command ${content}`);
+          log.debug(`Sending command ${JSON.stringify(cmd)}`);
         })
         .catch((e) => {
-          log.error(`Error occurred sending command ${content}: ${e}`);
+          log.error(
+            `Error occurred sending command ${JSON.stringify(cmd)}: ${e}`,
+          );
         });
     },
   };

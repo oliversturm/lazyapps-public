@@ -1,4 +1,5 @@
 import { query } from '$lib/query.js';
+import { nanoid } from 'nanoid';
 
 // This demo works client-side only. I made that
 // decision only because the URLs I'm using through
@@ -6,13 +7,14 @@ import { query } from '$lib/query.js';
 // ones and I wanted to keep things "simple".
 export const ssr = false;
 
-const readModelEndpoint =
-  import.meta.env.VITE_RM_CUSTOMERS_URL || 'http://127.0.0.1:3003'; // customers
+const readModelEndpoint = import.meta.env.VITE_RM_CUSTOMERS_URL || 'http://127.0.0.1:3003'; // customers
 
 export function load({ fetch, params }) {
-  return {
-    items: query(fetch)(readModelEndpoint, 'editing', 'byId', {
-      id: params.id,
-    }),
-  };
+	const correlationId = `SVLT-${nanoid()}`;
+	return {
+		correlationId,
+		items: query(correlationId, fetch)(readModelEndpoint, 'editing', 'byId', {
+			id: params.id
+		})
+	};
 }

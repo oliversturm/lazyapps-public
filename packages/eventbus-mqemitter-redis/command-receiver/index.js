@@ -3,8 +3,6 @@ import pRetry from 'p-retry';
 import { getLogger } from '@lazyapps/logger';
 import { connect } from '../connect.js';
 
-const log = getLogger('CP/EB');
-
 // NOTE NOTE OLD COMMENT -- may not need this anymore with
 // different other mq systems.
 //
@@ -19,7 +17,7 @@ const log = getLogger('CP/EB');
 // choosing the simple workaround of a small built-in startup
 // delay for now.
 const waitSubscribers =
-  (millis) =>
+  (log, millis) =>
   (...args) =>
     new Promise((resolve) => {
       log.debug('Waiting for subscribers to catch up');
@@ -29,33 +27,40 @@ const waitSubscribers =
 export const mqEmitterRedis =
   ({ host = '127.0.0.1', port = 6379 } = {}) =>
   () => {
+    const initLog = getLogger('CP/EB/Redis', 'INIT');
+
     return pRetry(() => connect({ host, port }), {
       onFailedAttempt: (error) => {
-        log.error(
+        initLog.error(
           `Attempt ${error.attemptNumber} failed connecting to Redis on port ${port}: '${error}'. Will retry another ${error.retriesLeft} times.`,
         );
       },
       retries: 10,
     })
       .catch((err) => {
-        log.error(`Failed to connect to Redis on port ${port}: ${err}`);
+        initLog.error(`Failed to connect to Redis on port ${port}: ${err}`);
       })
-      .then(waitSubscribers(1000))
+      .then(waitSubscribers(initLog, 1000))
       .then((mq) => {
-        log.info(`Event bus publishing to port ${port}`);
+        initLog.info(`Event bus publishing to port ${port}`);
         return mq;
       })
       .then((mq) => ({
-        publishEvent: (event) => {
+        publishEvent: (correlationId) => (event) => {
+          const log = getLogger('CP/EB/Redis', correlationId);
           log.debug(`Publishing event timestamp ${event.timestamp}`);
-          mq.emit({ topic: 'events', payload: event });
+          mq.emit({ topic: 'events', payload: { correlationId, event } });
           return event;
         },
-        publishReplayState: (state) => {
+        publishReplayState: (correlationId) => (state) => {
+          const log = getLogger('CP/EB/Redis', correlationId);
           log.debug(`Publishing replay state ${state}`);
           mq.emit({
             topic: '__system',
-            payload: { type: 'SET_REPLAY_STATE', state },
+            payload: {
+              correlationId,
+              event: { type: 'SET_REPLAY_STATE', state },
+            },
           });
           return state;
         },

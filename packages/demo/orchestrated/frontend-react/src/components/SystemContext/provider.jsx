@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 
 import { postCommand, query } from './http';
+import { nanoid } from 'nanoid';
 
 const SystemContext = React.createContext();
 
@@ -17,7 +18,7 @@ const SystemProvider = ({
           ...r,
           [v]: { query: query(readModelEndpoints[v]) },
         }),
-        {}
+        {},
       ),
       commands: Object.keys(aggregates).reduce(
         (r, aggregateName) => ({
@@ -31,15 +32,16 @@ const SystemProvider = ({
                   aggregateId,
                   command: aggregates[aggregateName][cmdName],
                   payload,
+                  correlationId: `REACT-${nanoid()}`,
                 }),
             }),
-            {}
+            {},
           ),
         }),
-        {}
+        {},
       ),
     }),
-    [aggregates, readModelEndpoints, commandEndpoint]
+    [aggregates, readModelEndpoints, commandEndpoint],
   );
   return (
     <SystemContext.Provider value={context}>{children}</SystemContext.Provider>

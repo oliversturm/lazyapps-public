@@ -17,7 +17,8 @@
     "@lazyapps/aggregatestore-inmemory": "workspace:^",
     "@lazyapps/eventbus-mqemitter-redis": "workspace:^",
     "@lazyapps/eventstore-mongodb": "workspace:^",
-    "@lazyapps/logger": "workspace:^"
+    "@lazyapps/logger": "workspace:^",
+    "nanoid": "^5.0.7"
   },
   "type": "module"
 }

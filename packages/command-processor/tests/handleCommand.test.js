@@ -5,10 +5,11 @@ describe('handleCommand', () => {
   test('handleCommand', () => {
     const aggregateStore = {
       getAggregateState: vi.fn(),
-      applyAggregateProjection: vi.fn().mockImplementation((x) => x),
+      applyAggregateProjection: (/*correlationId*/) =>
+        vi.fn().mockImplementation((x) => x),
     };
     const eventStore = {
-      addEvent: vi.fn().mockImplementation((x) => x),
+      addEvent: (/*correlationId*/) => vi.fn().mockImplementation((x) => x),
     };
     const eventBus = {
       publishEvent: vi.fn().mockImplementation((x) => x),
@@ -31,7 +32,7 @@ describe('handleCommand', () => {
       {
         flag: 'payload',
       },
-      commandHandler /*, auth, timestamp */,
+      commandHandler /*, auth, timestamp, correlationId */,
     ).then((res) => {
       expect(res).toEqual({
         type: 'DONE',

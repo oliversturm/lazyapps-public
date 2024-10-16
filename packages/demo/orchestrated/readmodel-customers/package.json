@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "vitest",
-    "start": "node --watch index.js"
+    "start": "node --require ./tracing.cjs --watch index.js"
   },
   "keywords": [],
   "author": "",
@@ -21,7 +21,13 @@
     "@lazyapps/eventbus-rabbitmq": "workspace:^",
     "@lazyapps/express": "workspace:^",
     "@lazyapps/readmodels": "workspace:^",
-    "@lazyapps/readmodelstorage-mongodb": "workspace:^"
+    "@lazyapps/readmodelstorage-mongodb": "workspace:^",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.50.0",
+    "@opentelemetry/exporter-trace-otlp-grpc": "^0.53.0",
+    "@opentelemetry/resources": "^1.26.0",
+    "@opentelemetry/sdk-node": "^0.53.0",
+    "@opentelemetry/semantic-conventions": "^1.27.0"
   },
   "type": "module"
 }

@@ -7,6 +7,9 @@ import * as readModels from './readmodels/index.js';
 import { commandSenderFetch } from '@lazyapps/command-sender-fetch';
 
 start({
+  correlation: {
+    serviceId: 'RM/CUS',
+  },
   readModels: {
     listener: express({ port: process.env.EXPRESS_PORT || 3003 }),
     storage: mongodb({

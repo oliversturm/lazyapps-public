@@ -34,5 +34,29 @@ const getStream = (output) =>
     },
   });
 
-export const { getLogger } = log;
+/**
+ * Get a logger with a specific name.
+ * @param {string} name The name of the logger.
+ * @param {string} correlationId The correlation ID to use.
+ * @returns {object} The logger object.
+ */
+export const getLogger = (name, correlationId) => {
+  const logger = log.getLogger(name);
+  const cid = correlationId || `CORR-NONE`;
+  return {
+    traceBare: (msg) => logger.trace(msg),
+    debugBare: (msg) => logger.debug(msg),
+    infoBare: (msg) => logger.info(msg),
+    warnBare: (msg) => logger.warn(msg),
+    errorBare: (msg) => logger.error(msg),
+    logBare: (msg) => logger.log(msg),
+    trace: (msg) => logger.trace(`[${cid}] ${msg}`),
+    debug: (msg) => logger.debug(`[${cid}] ${msg}`),
+    info: (msg) => logger.info(`[${cid}] ${msg}`),
+    warn: (msg) => logger.warn(`[${cid}] ${msg}`),
+    error: (msg) => logger.error(`[${cid}] ${msg}`),
+    log: (msg) => logger.log(`[${cid}] ${msg}`),
+  };
+};
+
 export { getStream };

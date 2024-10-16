@@ -2,7 +2,7 @@ import { getLogger } from '@lazyapps/logger';
 import { createApiHandler } from './query.js';
 import { runExpress } from '../runExpress.js';
 
-const log = getLogger('EX/RM/HTTP');
+const log = getLogger('EX/RM/HTTP', 'INIT');
 
 const installHandlers = (context, app) => {
   const executeQuery = createApiHandler(context);
@@ -15,7 +15,7 @@ const installHandlers = (context, app) => {
           readModelName,
           readModel,
           resolverName,
-          resolver
+          resolver,
         );
         app.post(`/query/${readModelName}/${resolverName}`, handler);
         app.get(`/query/${readModelName}/${resolverName}`, handler);

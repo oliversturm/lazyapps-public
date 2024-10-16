@@ -14,7 +14,8 @@
     endpointName,
     socketIoEndpoint,
     'overview',
-    'all'
+    'all',
+    data.correlationId
   );
   $: {
     if ($store.needsReload) {

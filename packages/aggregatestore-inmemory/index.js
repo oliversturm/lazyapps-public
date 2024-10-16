@@ -1,6 +1,6 @@
 import { getLogger } from '@lazyapps/logger';
 
-const log = getLogger('CmdProc/AS');
+const initLogger = getLogger('CmdProc/AS', 'INIT');
 
 export const inmemory = () => (aggregates) => {
   const store = {};
@@ -15,11 +15,12 @@ export const inmemory = () => (aggregates) => {
     store[name][id] = state;
   };
 
-  const applyAggregateProjection = (event) => {
+  const applyAggregateProjection = (correlationId) => (event) => {
     const { aggregateName, aggregateId, type, timestamp } = event;
     const projection =
       aggregates[aggregateName].projections &&
       aggregates[aggregateName].projections[type];
+    const log = getLogger('CmdProc/AS', correlationId);
     if (projection) {
       const state = getAggregateState(aggregateName, aggregateId);
       const projected = projection(state, event);
@@ -46,12 +47,12 @@ export const inmemory = () => (aggregates) => {
   };
 
   const startReplay = () => {
-    log.debug('Starting replay state for aggregate store');
+    initLogger.debug('Starting replay state for aggregate store');
     inReplay = true;
   };
 
   const endReplay = () => {
-    log.debug('Ending replay state for aggregate store');
+    initLogger.debug('Ending replay state for aggregate store');
     inReplay = false;
   };
   return {

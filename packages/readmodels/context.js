@@ -3,44 +3,35 @@ import { createSideEffectsHandler } from './sideEffects.js';
 import { createChangeNotificationHandler } from './changeNotification.js';
 import { createCommandHandler } from './commands.js';
 
-export const initializeContext = ({
-  readModels,
-  storage,
-  eventBus,
-  changeNotificationSender,
-  commandSender,
-}) =>
+export const initializeContext = (
+  correlationConfig,
+  { readModels, storage, eventBus, changeNotificationSender, commandSender },
+) =>
   storage()
-    .then((storage) => ({ storage, readModels }))
+    .then((storage) => ({ storage, readModels, correlationConfig }))
     .then((context) =>
       context.storage
         .readLastProjectedEventTimestamps(readModels)
-        .then(() => context)
+        .then(() => context),
     )
-    .then((context) =>
-      createCommandHandler({ commandSender }).then((commands) => ({
-        ...context,
-        commands,
-      }))
-    )
+    .then((context) => ({
+      ...context,
+      commands: createCommandHandler({ commandSender }),
+    }))
     .then((context) =>
       createSideEffectsHandler().then((sideEffects) => ({
         ...context,
         sideEffects,
-      }))
+      })),
     )
-    .then((context) =>
-      createChangeNotificationHandler(changeNotificationSender).then(
-        (changeNotification) => ({
-          ...context,
-          changeNotification,
-        })
-      )
-    )
-    .then((context) =>
-      createProjectionHandler(context).then((projectionHandler) => ({
-        ...context,
-        projectionHandler,
-      }))
-    )
+    .then((context) => ({
+      ...context,
+      changeNotification: createChangeNotificationHandler(
+        changeNotificationSender,
+      ),
+    }))
+    .then((context) => ({
+      ...context,
+      projectionHandler: createProjectionHandler(context),
+    }))
     .then((context) => eventBus(context).then(() => context));

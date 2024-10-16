@@ -1,14 +1,42 @@
 import { getLogger } from '@lazyapps/logger';
 import { getSharedMqEmitter } from './mqEmitterRegistry.js';
+import { nanoid } from 'nanoid';
 
-const log = getLogger('CR/MQ');
-
+// The terminology is not optimal here. In the case of other
+// transports, for instance the project eventbus-rabbitmq,
+// there are "command-receiver" implementations which apply
+// to the command receiver component of the architecture in that
+// they allow that received to send events to the event bus.
+// For this mqemitter implementation, the command receiver
+// is the component that receives commands and handles them --
+// in the case of rabbit etc such an implementation does not
+// currently exist, so the inconsistency has existed for a while.
+// For mqemitter, the publishEvent stuff is in the
+// commandProcessorEventBusMqEmitter.js file.
+//
 export const commandReceiverMqEmitter =
   ({ mqName }) =>
-  ({ aggregateStore, eventStore, eventBus, aggregates, handleCommand }) => {
-    return Promise.resolve(getSharedMqEmitter(mqName))
+  ({
+    aggregateStore,
+    eventStore,
+    eventBus,
+    aggregates,
+    handleCommand,
+    correlationConfig,
+  }) => {
+    const initLog = getLogger('CR/MQ', 'INIT');
+
+    return Promise.resolve(getSharedMqEmitter('INIT', mqName))
       .then((mq) => {
         mq.on('command', ({ payload: messagePayload }, cb) => {
+          let { correlationId } = messagePayload;
+          if (!correlationId) {
+            correlationId = `${
+              correlationConfig?.serviceId || 'UNK'
+            }-${nanoid()}`;
+          }
+
+          const log = getLogger('CR/MQ', correlationId);
           log.debug(`Received command: ${JSON.stringify(messagePayload)}`);
           const { command, aggregateName, aggregateId, payload } =
             messagePayload;
@@ -27,7 +55,10 @@ export const commandReceiverMqEmitter =
               aggregateName,
               aggregateId,
               payload,
-              commandHandler /*, auth, timestamp */,
+              commandHandler,
+              undefined /* auth */,
+              undefined /* timestamp */,
+              correlationId,
             ).catch((err) => {
               log.error(`An error occurred handling command ${command} for aggregate ${aggregateName}(${aggregateId}) with payload:
     
@@ -40,6 +71,6 @@ export const commandReceiverMqEmitter =
         });
       })
       .then(() => {
-        log.debug('Command receiver active');
+        initLog.debug('Command receiver active');
       });
   };

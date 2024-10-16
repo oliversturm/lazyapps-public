@@ -1,14 +1,19 @@
 import { getLogger } from '@lazyapps/logger';
-
-const ioLog = getLogger('Changes/IO');
-const rmLog = getLogger('Changes/RM');
+import { nanoid } from 'nanoid';
 
 const getRoomName = (endpointName, readModelName, resolverName) =>
   `${endpointName}/${readModelName}/${resolverName}`;
 
-export const initSockets = (io, ioAuthHandler) => {
-  ioLog.debug('Initializing sockets');
+const ioInitLog = getLogger('Changes/IO', 'INIT');
+
+export const initSockets = (correlationConfig, io, ioAuthHandler) => {
+  ioInitLog.debug('Initializing sockets');
   io.on('connect', (socket) => {
+    const existingId = socket.handshake.query?.correlationId;
+    socket.correlationId =
+      existingId || `${correlationConfig?.serviceId || 'UNK'}-${nanoid()}`;
+
+    const ioLog = getLogger('Changes/IO', socket.correlationId);
     ioLog.debug(
       `Connection: ${socket.id} (handshake: ${JSON.stringify(
         socket.handshake,
@@ -58,6 +63,8 @@ export const initSockets = (io, ioAuthHandler) => {
 export const createNotifier = (io, changeInfoAuthHandler) => {
   const handler = (req, res) => {
     const auth = req.auth;
+    const rmLog = getLogger('Changes/RM', req.body.correlationId);
+
     if (!changeInfoAuthHandler(auth)) {
       rmLog.error(
         `Unauthorized changeInfo ${JSON.stringify(req.body)} (claims ${auth})`,

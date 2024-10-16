@@ -1,8 +1,6 @@
 import { getLogger } from '@lazyapps/logger';
 import { channelWithExchange } from '../channelWithExchange.js';
 
-const log = getLogger('CP/EB');
-
 export const rabbitMq = (config) => () => {
   const defaultConfig = {
     url: 'amqp://localhost',
@@ -13,20 +11,33 @@ export const rabbitMq = (config) => () => {
   const actualConfig = { ...defaultConfig, ...config };
   const { exchange, topic } = actualConfig;
 
-  return channelWithExchange(actualConfig, log).then(({ channel }) => {
-    log.info(`Event bus connected to Rabbit MQ exchange "${exchange}"`);
+  const initLog = getLogger('CP/EB/Rabbit', 'INIT');
+
+  return channelWithExchange(actualConfig, initLog).then(({ channel }) => {
+    initLog.info(`Event bus connected to Rabbit MQ exchange "${exchange}"`);
     return {
-      publishEvent: (event) => {
+      publishEvent: (correlationId) => (event) => {
+        const log = getLogger('CmdProc/EB/Rabbit', correlationId);
         log.debug(`Publishing event timestamp ${event.timestamp}`);
-        channel.publish(exchange, topic, Buffer.from(JSON.stringify(event)));
+        channel.publish(
+          exchange,
+          topic,
+          Buffer.from(JSON.stringify({ correlationId, event })),
+        );
         return event;
       },
-      publishReplayState: (state) => {
+      publishReplayState: (correlationId) => (state) => {
+        const log = getLogger('CmdProc/EB/Rabbit', correlationId);
         log.debug(`Publishing replay state ${state}`);
         channel.publish(
           exchange,
           '__system',
-          Buffer.from(JSON.stringify({ type: 'SET_REPLAY_STATE', state })),
+          Buffer.from(
+            JSON.stringify({
+              correlationId,
+              event: { type: 'SET_REPLAY_STATE', state },
+            }),
+          ),
         );
         return state;
       },

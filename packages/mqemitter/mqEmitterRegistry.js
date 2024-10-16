@@ -2,8 +2,6 @@ import { getLogger } from '@lazyapps/logger';
 import cs from 'mqemitter-cs';
 import net from 'node:net';
 
-const log = getLogger('MQ/Reg');
-
 // These emitters are process bounded and they must be shared
 // between different parts of the process. In the case of
 // the frontend processes that use vite (or whatever bundler)
@@ -21,6 +19,8 @@ const log = getLogger('MQ/Reg');
 const emitters = new Map();
 
 export const registerSharedMqEmitter = (name, emitter, port = undefined) => {
+  const log = getLogger('MQ/Reg', 'INIT');
+
   log.debug(`Registering shared MQ emitter: ${name}`);
   emitters.set(name, emitter);
   if (port) {
@@ -33,15 +33,19 @@ export const registerSharedMqEmitter = (name, emitter, port = undefined) => {
   }
 };
 
-export const getSharedMqEmitter = (name) => {
+export const getSharedMqEmitter = (correlationId, name) => {
+  const log = getLogger('MQ/Reg', correlationId);
   if (!emitters.has(name)) {
-    throw new Error(`No shared MQ emitter registered for name: ${name}`);
+    throw new Error(
+      `[${correlationId}] No shared MQ emitter registered for name: ${name}`,
+    );
   }
   log.debug(`Getting shared MQ emitter: ${name}`);
   return emitters.get(name);
 };
 
-export const getPublishedMqEmitter = (port) => {
+export const getPublishedMqEmitter = (correlationId, port) => {
+  const log = getLogger('MQ/Reg', correlationId);
   log.debug(`Getting published MQ emitter on port ${port}`);
   return cs.client(net.connect(port));
 };

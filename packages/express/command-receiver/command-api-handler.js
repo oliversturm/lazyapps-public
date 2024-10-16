@@ -1,15 +1,22 @@
 import { getLogger } from '@lazyapps/logger';
 
-const log = getLogger('EX/CP/Handler');
-
 export const createApiHandler =
   ({ aggregateStore, eventStore, eventBus, aggregates, handleCommand }) =>
   (req, res) => {
     // Record timestamp as early as possible
     const reqTimestamp = Date.now();
 
-    log.debug(`Command received: ${JSON.stringify(req.body)}`);
-    const { command, aggregateName, aggregateId, payload } = req.body;
+    const { command, aggregateName, aggregateId, payload, correlationId } =
+      req.body;
+    const log = getLogger('EX/CP/Handler', correlationId);
+    log.debug(
+      `Command received: ${JSON.stringify({
+        command,
+        aggregateName,
+        aggregateId,
+        payload,
+      })}`,
+    );
     const auth = req.auth;
     if (!command || !aggregateName || !aggregateId) {
       res.status(400).send('Missing field');
@@ -39,6 +46,7 @@ export const createApiHandler =
       commandHandler,
       auth,
       reqTimestamp,
+      correlationId,
     )
       .then(() => {
         res.sendStatus(200);

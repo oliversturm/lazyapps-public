@@ -1,8 +1,6 @@
 import { getLogger } from '@lazyapps/logger';
 import { getSharedMqEmitter } from './mqEmitterRegistry.js';
 
-const log = getLogger('RM/EB');
-
 export const readModelEventBusMqEmitter =
   ({ mqName }) =>
   (context) => {
@@ -16,26 +14,31 @@ export const readModelEventBusMqEmitter =
       }
     };
 
-    return Promise.resolve(getSharedMqEmitter(mqName))
+    const initLog = getLogger('RM/EB', 'INIT');
+
+    return Promise.resolve(getSharedMqEmitter('INIT', mqName))
       .then((mq) => {
         mq.on('events', ({ payload }, cb) => {
-          log.debug(
-            `Received message on topic 'events': ${JSON.stringify(payload)}`
+          const { correlationId } = payload;
+          const log = getLogger('RM/EB', correlationId);
+          log.debug(`Received event: ${JSON.stringify(payload)}`);
+          context.projectionHandler.projectEvent(correlationId)(
+            payload,
+            inReplay,
           );
-          context.projectionHandler.projectEvent(payload, inReplay);
 
           cb();
         });
         mq.on('__system', ({ payload }, cb) => {
-          log.debug(
-            `Received message on topic 'events': ${JSON.stringify(payload)}`
-          );
+          const { correlationId } = payload;
+          const log = getLogger('RM/EB', correlationId);
+          log.debug(`Received '__system' event: ${JSON.stringify(payload)}`);
 
           handleSysMessage(payload);
           cb();
         });
       })
       .then(() => {
-        log.debug(`Event bus receiving`);
+        initLog.debug(`Event bus receiving`);
       });
   };

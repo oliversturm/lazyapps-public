@@ -8,6 +8,9 @@ import { commandSenderFetch } from '@lazyapps/command-sender-fetch';
 import { customizeExpress } from './graphql-server.js';
 
 start({
+  correlation: {
+    serviceId: 'RM/ORD',
+  },
   readModels: {
     listener: express({
       port: process.env.EXPRESS_PORT || 3005,

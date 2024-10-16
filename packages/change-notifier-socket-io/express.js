@@ -7,26 +7,55 @@ import { expressjwt } from 'express-jwt';
 import { socketIoCookieJwt } from './socketIoCookieJwt.js';
 import { Server as SocketIoServer } from 'socket.io';
 import http from 'http';
+import { nanoid } from 'nanoid';
 
 import { getLogger, getStream } from '@lazyapps/logger';
 import { initSockets, createNotifier } from './notifier.js';
 
-const log = getLogger('Changes/HTTP');
+const log = getLogger('Changes/HTTP', 'INIT');
 
-const runExpress = ({
-  port = 3008,
-  host = '0.0.0.0',
-  jwtSecret,
-  authCookieName,
-  credentialsRequired,
-  ioAuthHandler,
-  changeInfoAuthHandler,
-}) => {
+const correlationId = (correlationConfig) => (req, res, next) => {
+  // check where a correlation Id might already exist
+  const existingId = req.body.correlationId || req.headers['x-correlation-id'];
+
+  // since we want to use it in code, make sure the body
+  // now has an id in any case
+  req.body.correlationId =
+    existingId || `${correlationConfig?.serviceId || 'UNK'}-${nanoid()}`;
+
+  // also in the result, not needed right now but can't hurt
+  // for debugging
+  res.setHeader('X-Correlation-ID', req.body.correlationId);
+  next();
+};
+
+morgan.token('correlation-id', function (req) {
+  return req.body.correlationId;
+});
+
+const runExpress = (
+  correlationConfig,
+  {
+    port = 3008,
+    host = '0.0.0.0',
+    jwtSecret,
+    authCookieName,
+    credentialsRequired,
+    ioAuthHandler,
+    changeInfoAuthHandler,
+  },
+) => {
   return new Promise((resolve, reject) => {
     const app = express();
     app.use(cors());
-    app.use(morgan('dev', { stream: getStream(log.debug) }));
     app.use(bodyParser.json());
+    app.use(correlationId(correlationConfig));
+    app.use(
+      morgan(
+        '[:correlation-id] :method :url :status :response-time ms - :res[content-length]',
+        { stream: getStream(log.debugBare) },
+      ),
+    );
     app.use(cookieParser());
 
     // Similar code as in express/runExpress.js -- refactor?
@@ -62,7 +91,11 @@ const runExpress = ({
       cors: { origin: true },
     });
     io.use(socketIoCookieJwt({ jwtSecret, cookieName: authCookieName }));
-    initSockets(io, jwtSecret && ioAuthHandler ? ioAuthHandler : () => true);
+    initSockets(
+      correlationConfig,
+      io,
+      jwtSecret && ioAuthHandler ? ioAuthHandler : () => true,
+    );
     const notifier = createNotifier(
       io,
       jwtSecret && changeInfoAuthHandler ? changeInfoAuthHandler : () => true,

@@ -2,10 +2,10 @@ import jwt from 'jsonwebtoken';
 
 import { getLogger } from '@lazyapps/logger';
 
-const log = getLogger('Tokens/Handlers');
-
 const createJwt = (config, req) => {
   const input = req.body;
+  const log = getLogger('Tokens/Hndl', input.correlationId);
+
   try {
     const { claims, options } = config.getClaims(input);
     return jwt.sign(claims, config.secret, options);
@@ -15,8 +15,12 @@ const createJwt = (config, req) => {
   }
 };
 
+// I should probably have a real refresh token
+// mechanism here. But since I only use this
+// for the millionaire app, it is fine like this.
 export const login = (config) => (req, res) => {
   const token = createJwt(config, req);
+  const log = getLogger('Tokens/Hndl', req.body.correlationId);
 
   res.cookie(config.cookieName || 'access_token', token, {
     httpOnly: true,

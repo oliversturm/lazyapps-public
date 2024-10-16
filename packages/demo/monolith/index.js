@@ -17,7 +17,7 @@ import * as aggregates from './aggregates/index.js';
 import * as readModels from './readmodels/index.js';
 import { getLogger } from '@lazyapps/logger';
 
-const log = getLogger('Monolith');
+const log = getLogger('Monolith', 'INIT');
 
 log.debug('Starting up');
 
@@ -29,6 +29,9 @@ registerSharedMqEmitter('events', mqemitter());
 registerSharedMqEmitter('queries', mqemitter(), mqQueriesPort);
 
 start({
+  correlation: {
+    serviceId: 'MONO',
+  },
   commands: {
     receiver: commandReceiverMqEmitter({ mqName: 'commands' }),
     aggregateStore: inmemory(),

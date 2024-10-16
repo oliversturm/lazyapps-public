@@ -1,6 +1,9 @@
 import fetch from 'isomorphic-fetch';
 import convert from 'xml-js';
-import { checkOrderValue } from './confirmationRequests.js';
+import {
+  checkOrderValue,
+  confirmationRequestsCollectionName,
+} from './confirmationRequests.js';
 
 export const customersCollectionName = 'orders_customers';
 export const ordersCollectionName = 'orders_overview';
@@ -114,6 +117,17 @@ export default {
             // requires a full reload
             sendChangeNotification(
               createChangeInfo('orders', 'overview', 'all', 'all'),
+            ),
+          ),
+        storage
+          .updateMany(
+            confirmationRequestsCollectionName,
+            { customerId: aggregateId },
+            { $set: { customerName: name } },
+          )
+          .then(() =>
+            sendChangeNotification(
+              createChangeInfo('orders', 'confirmationRequests', 'all', 'all'),
             ),
           ),
       ]),

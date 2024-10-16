@@ -22,8 +22,10 @@
   };
 </script>
 
-{#if !$store || $store.isEmpty}
+{#if !$store.loaded}
   <Working />
+{:else if $store.isEmpty}
+  <div class="p-2 bg-yellow-200">No data</div>
 {:else}
   <Table>
     <Thead>

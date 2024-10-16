@@ -3,17 +3,19 @@ import pRetry from 'p-retry';
 
 import { getLogger } from '@lazyapps/logger';
 
-const log = getLogger('RM/Store');
-
-const wrapCalls = (dbContext, names) =>
-  names.reduce(
+const wrapCalls = (correlationId, dbContext, names) => {
+  const log = getLogger('RM/MongoAPI', correlationId);
+  return names.reduce(
     (r, v) => ({
       ...r,
-      [v]: (collection, ...args) =>
-        dbContext.db.collection(collection)[v](...args),
+      [v]: (collection, ...args) => {
+        log.debug(`Calling ${v}(${JSON.stringify(args)}) on ${collection}`);
+        return dbContext.db.collection(collection)[v](...args);
+      },
     }),
     {},
   );
+};
 
 export const mongodb =
   ({ url, user, pwd, scheme, host, urlPath, database = 'readmodel' } = {}) =>
@@ -26,6 +28,8 @@ export const mongodb =
 
     const logLocation = user ? host : connectUrl;
 
+    const initLog = getLogger('RM/Mongo', 'INIT');
+
     return pRetry(
       () =>
         MongoClient.connect(connectUrl, {
@@ -34,7 +38,7 @@ export const mongodb =
         }),
       {
         onFailedAttempt: (error) => {
-          log.error(
+          initLog.error(
             `Attempt ${error.attemptNumber} failed connecting to MongoDB at ${logLocation}: '${error}'. Will retry another ${error.retriesLeft} times.`,
           );
         },
@@ -42,12 +46,32 @@ export const mongodb =
       },
     )
       .catch((err) => {
-        log.error(`Can't connect to MongoDB at ${logLocation}: ${err}`);
+        initLog.error(`Can't connect to MongoDB at ${logLocation}: ${err}`);
       })
       .then((client) => ({ client, db: client.db(database) }))
       .then((dbContext) => ({
+        perRequest: (correlationId) => ({
+          ...wrapCalls(correlationId, dbContext, [
+            'insertOne',
+            'insertMany',
+            'updateOne',
+            'updateMany',
+            'deleteOne',
+            'deleteMany',
+            'findOneAndUpdate',
+            'findOneAndDelete',
+            'findOneAndReplace',
+            'bulkWrite',
+            'find',
+            'countDocuments',
+          ]),
+        }),
         close: () => dbContext.client.close(),
-        updateLastProjectedEventTimestamps: (rmNames, timestamp) =>
+        updateLastProjectedEventTimestamps: (
+          correlationId,
+          rmNames,
+          timestamp,
+        ) =>
           rmNames.length
             ? dbContext.db
                 .collection('readmodel.state')
@@ -65,6 +89,7 @@ export const mongodb =
                   })),
                 )
                 .then((r) => {
+                  const log = getLogger('RM/Mongo', correlationId);
                   log.debug(
                     `Updated last projected event timestamps for ${JSON.stringify(
                       rmNames,
@@ -88,19 +113,5 @@ export const mongodb =
                 }),
             ),
           ),
-        ...wrapCalls(dbContext, [
-          'insertOne',
-          'insertMany',
-          'updateOne',
-          'updateMany',
-          'deleteOne',
-          'deleteMany',
-          'findOneAndUpdate',
-          'findOneAndDelete',
-          'findOneAndReplace',
-          'bulkWrite',
-          'find',
-          'countDocuments',
-        ]),
       }));
   };

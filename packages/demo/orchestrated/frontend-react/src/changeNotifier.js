@@ -9,10 +9,12 @@ const activateChangeNotifier = (endpoint, sourceMap, store) => {
       endpointName,
       readModelName,
       resolverName,
-    })
+    }),
   );
 
-  const socket = io(endpoint);
+  // The connection mechanism in this React implementation currently
+  // connects just once. Probably not optimal.
+  const socket = io(endpoint, { query: { correlationId: 'REACT-INIT' } });
   socket.on('connect', () => {
     socket.emit('register', registerResolvers);
   });
@@ -22,10 +24,10 @@ const activateChangeNotifier = (endpoint, sourceMap, store) => {
       ...r,
       [getKey(v)]: v.actionCreator,
     }),
-    {}
+    {},
   );
 
-  socket.on('change', changeInfo => {
+  socket.on('change', (changeInfo) => {
     store.dispatch(actionCreatorMap[getKey(changeInfo)](changeInfo));
   });
 };

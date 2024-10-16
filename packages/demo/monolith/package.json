@@ -4,16 +4,22 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "vitest",
-    "start": "LOG_LEVEL=trace node index.js"
+    "start": "run-s check-node just-start",
+    "start-highlight": "run-s check-node start-and-highlight",
+    "check-node": "node check-node-version.cjs",
+    "just-start": "cross-env LOG_LEVEL=trace node index.js",
+    "start-and-highlight": "cross-env LOG_LEVEL=trace node index.js | node ../../log-highlight/index.js",
+    "start-mongo": "docker run --rm -p 27017:27017 --name mongo -d mongo:latest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "eslint": "^8.46.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-svelte": "^2.32.4",
+    "npm-run-all2": "^6.2.3",
     "prettier": "^3.0.1",
     "prettier-plugin-svelte": "^3.0.3",
     "vitest": "^0.34.5"
@@ -34,11 +40,16 @@
     "@sveltejs/vite-plugin-svelte": "^2.4.4",
     "mqemitter": "^5.0.0",
     "nanoid": "^4.0.2",
+    "semver": "^7.6.3",
     "socket.io-client": "^4.7.2",
     "svelte": "^4.1.2",
     "typescript": "^5.1.6",
     "vite": "^4.4.9",
     "yup": "^1.2.0"
   },
-  "type": "module"
+  "type": "module",
+  "engines": {
+    "node": ">=18.20.3 < 19.0.0 || >=20.18.0"
+  },
+  "engineStrict": true
 }

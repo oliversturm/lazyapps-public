@@ -2,10 +2,14 @@ import { redirect } from '@sveltejs/kit';
 import { postCommand } from '$lib/commands.js';
 import { query } from '$lib/query.js';
 import customerEditSchema from '$lib/schemas/customerEditSchema.js';
+import { nanoid } from 'nanoid';
 
-export function load({ params }) {
+export async function load({ params }) {
+	const correlationId = `SVLT-${nanoid()}`;
+
 	return {
-		items: query('customersEditing', 'byId', {
+		correlationId,
+		items: await query(correlationId, 'customersEditing', 'byId', {
 			id: params.id
 		})
 	};
@@ -22,6 +26,8 @@ export const actions = {
 		}
 
 		await postCommand({
+			// new correlation id, posting this command begins a new process
+			correlationId: `SVLT-${nanoid()}`,
 			aggregateName: 'customer',
 			aggregateId: formData.id,
 			command: formData.command,
