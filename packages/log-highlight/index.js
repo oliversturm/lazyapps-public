@@ -118,7 +118,7 @@ function processLines() {
           source,
         )}] ${levelColor(pad(level))}: [${hl.highlight(
           pad(correlationId),
-        )}]${rest}`;
+        )}]\n -> ${rest}\n`;
       } else {
         thisOutput = `--- skipping line starting with: ${chalk.italic(
           line.slice(0, 20),
