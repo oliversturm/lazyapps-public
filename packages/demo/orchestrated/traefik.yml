@@ -1,0 +1,112 @@
+http:
+  routers:
+    dashboardUI:
+      rule: "Host(`dashboardUI.localhost`)"
+      entrypoints:
+        - web
+      service: dashboardUI
+
+    dashboardOtlpGrpc:
+      rule: "Host(`dashboard-otlp-grpc.localhost`)"
+      entrypoints:
+        - web
+      service: dashboardOtlpGrpc
+
+    dashboardOtlpHttp:
+      rule: "Host(`dashboard-otlp-http.localhost`)"
+      entrypoints:
+        - web
+      service: dashboardOtlpHttp
+
+    command-processor-orchestrated:
+      rule: "Host(`commands.localhost`)"
+      entrypoints:
+        - web
+      service: command-processor-orchestrated
+
+    readmodel-customers-orchestrated:
+      rule: "Host(`rm-customers.localhost`)"
+      entrypoints:
+        - web
+      service: readmodel-customers-orchestrated
+
+    readmodel-orders-orchestrated:
+      rule: "Host(`rm-orders.localhost`)"
+      entrypoints:
+        - web
+      service: readmodel-orders-orchestrated
+
+    readmodel-dotnet-orchestrated:
+      rule: "Host(`rm-dotnet.localhost`)"
+      entrypoints:
+        - web
+      service: readmodel-dotnet-orchestrated
+
+    change-notifier-orchestrated:
+      rule: "Host(`change-notifier.localhost`)"
+      entrypoints:
+        - web
+      service: change-notifier-orchestrated
+
+    frontend-react-orchestrated:
+      rule: "Host(`react.localhost`)"
+      entrypoints:
+        - web
+      service: frontend-react-orchestrated
+
+    frontend-svelte-orchestrated:
+      rule: "Host(`svelte.localhost`)"
+      entrypoints:
+        - web
+      service: frontend-svelte-orchestrated
+
+  services:
+    dashboardUI:
+      loadBalancer:
+        servers:
+          - url: "http://dashboard:18888"
+
+    dashboardOtlpGrpc:
+      loadBalancer:
+        servers:
+          - url: "http://dashboard:18889"
+
+    dashboardOtlpHttp:
+      loadBalancer:
+        servers:
+          - url: "http://dashboard:18890"
+
+    command-processor-orchestrated:
+      loadBalancer:
+        servers:
+          - url: "http://command-processor:80"
+
+    readmodel-customers-orchestrated:
+      loadBalancer:
+        servers:
+          - url: "http://readmodel-customers:80"
+
+    readmodel-orders-orchestrated:
+      loadBalancer:
+        servers:
+          - url: "http://readmodel-orders:80"
+
+    readmodel-dotnet-orchestrated:
+      loadBalancer:
+        servers:
+          - url: "http://readmodel-dotnet:8080"
+
+    change-notifier-orchestrated:
+      loadBalancer:
+        servers:
+          - url: "http://change-notifier:80"
+
+    frontend-react-orchestrated:
+      loadBalancer:
+        servers:
+          - url: "http://frontend-react:5173"
+
+    frontend-svelte-orchestrated:
+      loadBalancer:
+        servers:
+          - url: "http://frontend-svelte:5173"

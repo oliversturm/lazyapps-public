@@ -1,12 +1,23 @@
 services:
   traefik:
     image: traefik:3.1.2
-    command: --api.insecure=true --providers.docker --tracing.otlp=true --tracing.otlp.grpc.endpoint=dashboard:18889 --tracing.otlp.grpc.insecure=true
+    command:
+      - '--log=true'
+      - '--log.level=INFO'
+      - '--accesslog=true'
+      - '--api.insecure=true'
+      - '--providers.file=true'
+      - '--providers.file.filename=/etc/traefik/dynamic.yml'
+      - '--tracing.otlp=true'
+      - '--tracing.otlp.grpc.endpoint=dashboard:18889'
+      - '--tracing.otlp.grpc.insecure=true'
+      - '--entrypoints.web.address=:80'
     ports:
       - '80:80'
       - '8080:8080'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik.yml:/etc/traefik/dynamic.yml
     depends_on:
       - dashboard
 
@@ -18,16 +29,6 @@ services:
 
   dashboard:
     image: mcr.microsoft.com/dotnet/aspire-dashboard:8.1.0
-    labels:
-      - 'traefik.http.routers.dashboardUI.rule=Host(`dashboardUI.localhost`)'
-      - 'traefik.http.routers.dashboardUI.service=dashboardUI'
-      - 'traefik.http.services.dashboardUI.loadbalancer.server.port=18888'
-      - 'traefik.http.routers.dashboardOtlpGrpc.rule=Host(`dashboard-otlp-grpc.localhost`)'
-      - 'traefik.http.routers.dashboardOtlpGrpc.service=dashboardOtlpGrpc'
-      - 'traefik.http.services.dashboardOtlpGrpc.loadbalancer.server.port=18889'
-      - 'traefik.http.routers.dashboardOtlpHttp.rule=Host(`dashboard-otlp-http.localhost`)'
-      - 'traefik.http.routers.dashboardOtlpHttp.service=dashboardOtlpHttp'
-      - 'traefik.http.services.dashboardOtlpHttp.loadbalancer.server.port=18890'
 
 
   command-processor:
@@ -43,8 +44,6 @@ services:
         - action: sync
           path: ./command-processor
           target: /src/packages/demo/orchestrated/command-processor
-    labels:
-      - 'traefik.http.routers.command-processor-orchestrated.rule=Host(`commands.localhost`)'
     environment:
       EXPRESS_PORT: '80'
       MONGO_URL: 'mongodb://mongo:27017'
@@ -65,8 +64,6 @@ services:
         - action: sync
           path: ./readmodel-customers
           target: /src/packages/demo/orchestrated/readmodel-customers
-    labels:
-      - 'traefik.http.routers.readmodel-customers-orchestrated.rule=Host(`rm-customers.localhost`)'
     environment:
       EXPRESS_PORT: '80'
       MONGO_URL: 'mongodb://mongo:27017'
@@ -90,8 +87,6 @@ services:
         - action: sync
           path: ./readmodel-orders
           target: /src/packages/demo/orchestrated/readmodel-orders
-    labels:
-      - 'traefik.http.routers.readmodel-orders-orchestrated.rule=Host(`rm-orders.localhost`)'
     environment:
       EXPRESS_PORT: '80'
       MONGO_URL: 'mongodb://mongo:27017'
@@ -110,8 +105,6 @@ services:
     environment:
       RABBIT_URL: 'amqp://rabbit'
       DOTNET_WATCH_RESTART_ON_RUDE_EDIT: 1
-    labels:
-      - 'traefik.http.routers.readmodel-dotnet-orchestrated.rule=Host(`rm-dotnet.localhost`)'
     develop:
       watch:
         - action: sync
@@ -129,8 +122,6 @@ services:
         - action: sync
           path: ./change-notifier
           target: /src/packages/demo/orchestrated/change-notifier
-    labels:
-      - 'traefik.http.routers.change-notifier-orchestrated.rule=Host(`change-notifier.localhost`)'
     environment:
       EXPRESS_PORT: '80'
       LOG_LEVEL: 'trace'
@@ -149,8 +140,6 @@ services:
         - action: sync
           path: ./frontend-react/src
           target: /src/packages/demo/orchestrated/frontend-react/src
-    labels:
-      - 'traefik.http.routers.frontend-react-orchestrated.rule=Host(`react.localhost`)'
     environment:
       VITE_RM_CUSTOMERS_URL: 'http://rm-customers.localhost'
       VITE_RM_ORDERS_URL: 'http://rm-orders.localhost'
@@ -171,8 +160,6 @@ services:
         - action: sync
           path: ./frontend-svelte/src
           target: /src/packages/demo/orchestrated/frontend-svelte/src
-    labels:
-      - 'traefik.http.routers.frontend-svelte-orchestrated.rule=Host(`svelte.localhost`)'
     environment:
       VITE_RM_CUSTOMERS_URL: 'http://rm-customers.localhost'
       VITE_RM_ORDERS_URL: 'http://rm-orders.localhost'
