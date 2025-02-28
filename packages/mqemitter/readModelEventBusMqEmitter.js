@@ -30,11 +30,11 @@ export const readModelEventBusMqEmitter =
           cb();
         });
         mq.on('__system', ({ payload }, cb) => {
-          const { correlationId } = payload;
+          const { correlationId, event } = payload;
           const log = getLogger('RM/EB', correlationId);
-          log.debug(`Received '__system' event: ${JSON.stringify(payload)}`);
+          log.debug(`Received '__system' event: ${JSON.stringify(event)}`);
 
-          handleSysMessage(payload);
+          handleSysMessage(event);
           cb();
         });
       })

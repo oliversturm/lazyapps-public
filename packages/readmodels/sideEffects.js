@@ -6,7 +6,7 @@ const createSideEffectsHandler = () => {
 
   const schedule =
     (correlationId, inReplay) =>
-    (promise, options = {}) => {
+    (promiseGenerator, options = {}) => {
       const defaultOptions = { name: 'unnamed', execution: 'liveOnly' };
       const actualOptions = { ...defaultOptions, ...options };
 
@@ -21,7 +21,7 @@ const createSideEffectsHandler = () => {
               );
               resolve();
             })
-              .then(promise)
+              .then(promiseGenerator())
               .then(
                 () =>
                   new Promise((resolve) => {

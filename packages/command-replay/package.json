@@ -1,0 +1,19 @@
+{
+  "name": "@lazyapps/command-replay",
+  "version": "1.0.0",
+  "description": "Tool to replay recorded commands into a running LazyApps system",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "command-replay": "./index.js"
+  },
+  "dependencies": {
+    "@lazyapps/logger": "workspace:*",
+    "enquirer": "^2.3.6",
+    "node-fetch": "^3.3.0"
+  },
+  "devDependencies": {
+    "commander": "^13.1.0",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

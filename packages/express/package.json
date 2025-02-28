@@ -11,10 +11,11 @@
   "license": "ISC",
   "devDependencies": {
     "eslint": "^8.46.0",
-    "vitest": "^0.34.1"
+    "vitest": "^2.1.8"
   },
   "dependencies": {
     "@lazyapps/logger": "workspace:^",
+    "@lazyapps/tokens": "workspace:^",
     "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",

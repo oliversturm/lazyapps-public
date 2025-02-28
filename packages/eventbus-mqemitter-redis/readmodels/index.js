@@ -6,6 +6,7 @@ import { connect } from '../connect.js';
 export const mqEmitterRedis =
   ({ host = '127.0.0.1', port = 6379 } = {}) =>
   (context) => {
+    const initLog = getLogger('RM/EB/Redis', 'INIT');
     let inReplay = false;
 
     const handleSysMessage = (msg) => {
@@ -16,7 +17,6 @@ export const mqEmitterRedis =
       }
     };
 
-    const initLog = getLogger('RM/EB/Redis', 'INIT');
 
     return pRetry(() => connect({ host, port }), {
       onFailedAttempt: (error) => {
@@ -35,7 +35,7 @@ export const mqEmitterRedis =
           const log = getLogger('RM/EB/Redis', correlationId);
           log.debug(`Received event: ${JSON.stringify(event)}`);
           context.projectionHandler.projectEvent(correlationId)(
-            payload,
+            event,
             inReplay,
           );
 
@@ -46,7 +46,7 @@ export const mqEmitterRedis =
           const log = getLogger('RM/EB/Redis', correlationId);
           log.debug(`Received '__system' event: ${JSON.stringify(event)}`);
 
-          handleSysMessage(payload);
+          handleSysMessage(event);
           cb();
         });
       })

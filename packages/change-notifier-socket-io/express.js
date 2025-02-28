@@ -103,13 +103,15 @@ const runExpress = (
     app.post('/change', notifier);
 
     server.listen(port, host);
-    server.on('listening', resolve);
+    server.on('listening', () => {
+      resolve(server);
+    });
     server.on('error', reject);
   })
     .catch((err) => {
       log.error(`Can't run HTTP server: ${err}`);
     })
-    .then(() => {
+    .then((server) => {
       log.info(
         `HTTP API listening on port ${port}, ${
           jwtSecret && credentialsRequired ? 'requiring ' : 'checking for '
@@ -117,6 +119,7 @@ const runExpress = (
           authCookieName ? ` or a cookie named ${authCookieName}` : ''
         }`,
       );
+      return server;
     });
 };
 

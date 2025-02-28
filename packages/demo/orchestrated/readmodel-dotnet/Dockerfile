@@ -8,4 +8,4 @@ WORKDIR /src/packages/demo/orchestrated/readmodel-dotnet
 
 EXPOSE 8080
 
-CMD dotnet watch run --non-interactive
+CMD ["dotnet", "watch", "run", "--non-interactive"]

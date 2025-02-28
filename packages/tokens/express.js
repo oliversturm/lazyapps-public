@@ -5,8 +5,10 @@ import cors from 'cors';
 import http from 'http';
 
 import { getLogger, getStream } from '@lazyapps/logger';
-import { login, logout, getJwt } from './handlers.js';
+import { login, logout, getJwt, authStatus } from './handlers.js';
 import { nanoid } from 'nanoid';
+import { expressjwt } from 'express-jwt';
+import cookieParser from 'cookie-parser';
 
 const log = getLogger('Tokens/HTTP', 'INIT');
 
@@ -29,10 +31,17 @@ morgan.token('correlation-id', function (req) {
   return req.body.correlationId;
 });
 
-const runExpress = (correlationConfig, config) => {
-  const { port = 80, host = '0.0.0.0' } = config;
+export const runExpress = (correlationConfig, config) => {
+  const {
+    port = 80,
+    host = '0.0.0.0',
+    secret: jwtSecret,
+    authCookieName,
+    credentialsRequired,
+  } = config;
   return new Promise((resolve, reject) => {
     const app = express();
+    app.set('etag', false);
     app.use(cors());
     app.use(bodyParser.json());
     app.use(correlationId(correlationConfig));
@@ -42,22 +51,85 @@ const runExpress = (correlationConfig, config) => {
         { stream: getStream(log.debugBare) },
       ),
     );
+    app.use(cookieParser());
 
-    const server = http.createServer(app);
+    if (jwtSecret) {
+      log.debug('Using JWT');
+      app.use(
+        expressjwt(
+          defaultExpressJwtConfig(
+            jwtSecret,
+            authCookieName,
+            credentialsRequired,
+          ),
+        ),
+      );
+    } else {
+      log.debug('Not using JWT');
+    }
     app.post('/login', login(config));
     app.get('/logout', logout(config));
+    app.get('/authStatus', authStatus(config));
     app.post('/getJwt', getJwt(config));
 
+    app.use(defaultExpressJwtExpiryHandler(authCookieName));
+    const server = http.createServer(app);
     server.listen(port, host);
-    server.on('listening', resolve);
+    server.on('listening', () => {
+      resolve(server);
+    });
     server.on('error', reject);
   })
     .catch((err) => {
       log.error(`Can't run HTTP server: ${err}`);
     })
-    .then(() => {
+    .then((server) => {
       log.info(`HTTP API listening on port ${port}`);
+      return server;
     });
 };
 
-export { runExpress };
+export const defaultExpressJwtConfig = (
+  jwtSecret,
+  authCookieName,
+  credentialsRequired,
+) => ({
+  secret: jwtSecret,
+  algorithms: ['HS256'],
+  credentialsRequired: credentialsRequired || false,
+  getToken: (req) => {
+    const log = getLogger('Tokens/GetT', req.body.correlationId);
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.split(' ')[0] === 'Bearer'
+    ) {
+      log.debug('Using Authorization header');
+      return req.headers.authorization.split(' ')[1];
+    }
+    if (authCookieName) {
+      const token = req.cookies[authCookieName || 'access_token'];
+      if (token) {
+        log.debug('Using cookie');
+        return token;
+      }
+    }
+    log.debug('No token found');
+    return null;
+  },
+});
+
+export const defaultExpressJwtExpiryHandler =
+  (authCookieName) => (err, req, res, next) => {
+    if (err.name === 'UnauthorizedError') {
+      res.clearCookie(authCookieName || 'access_token', {
+        httpOnly: true,
+        sameSite: 'strict',
+      });
+      res.status(401).json({
+        error: 'Token expired or invalid',
+        code: 'token_expired',
+      });
+    } else {
+      next(err);
+    }
+  };

@@ -42,6 +42,22 @@ export const logout = (config) => (req, res) => {
   res.sendStatus(200);
 };
 
+export const authStatus = (/*config*/) => (req, res) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.set('Expires', '-1');
+  res.set('Pragma', 'no-cache');
+  const hasAuth = !!req.auth;
+  const log = getLogger('Tokens/Hndl', req.body.correlationId);
+  log.debug(`Auth status: ${hasAuth}`);
+  if (hasAuth) {
+    log.debug(`Claims-: ${JSON.stringify(req.auth)}`);
+  }
+  if (hasAuth) {
+    res.json({ status: 'authenticated', claims: req.auth });
+  } else {
+    res.json({ status: 'unauthenticated' });
+  }
+};
 export const getJwt = (config) => (req, res) => {
   const token = createJwt(config, req);
 

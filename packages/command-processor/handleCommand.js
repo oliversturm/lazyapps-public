@@ -15,8 +15,26 @@ export const handleCommand = (
   auth,
   timestamp = null,
   correlationId,
+  commandRecorder = null,
 ) =>
-  Promise.resolve(timestamp || Date.now()).then((timestamp) =>
+  Promise.resolve(timestamp || Date.now())
+    .then((timestamp) => {
+      if (commandRecorder) {
+        return commandRecorder
+          .recordCommand({
+            command,
+            aggregateName,
+            aggregateId,
+            payload,
+            auth,
+            timestamp,
+            correlationId,
+          })
+          .then(() => timestamp);
+      }
+      return timestamp;
+    })
+    .then((timestamp) =>
     Promise.resolve(
       aggregateStore.getAggregateState(aggregateName, aggregateId),
     )

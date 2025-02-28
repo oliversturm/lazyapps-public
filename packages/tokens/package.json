@@ -10,8 +10,10 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "cookie-parser": "^1.4.6",
     "eslint": "^8.46.0",
-    "vitest": "^0.34.1"
+    "express-jwt": "^8.4.1",
+    "vitest": "^2.1.8"
   },
   "type": "module",
   "dependencies": {

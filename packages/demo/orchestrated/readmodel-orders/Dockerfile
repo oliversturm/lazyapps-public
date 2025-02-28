@@ -14,4 +14,4 @@ WORKDIR /src/packages/demo/orchestrated/readmodel-orders
 
 EXPOSE 80
 
-CMD ["pnpm", "start"]
+CMD ["node", "--require", "./tracing.cjs", "--watch", "index.js"]

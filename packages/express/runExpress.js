@@ -6,6 +6,10 @@ import cookieParser from 'cookie-parser';
 import { expressjwt } from 'express-jwt';
 import { getStream } from '@lazyapps/logger';
 import { nanoid } from 'nanoid';
+import {
+  defaultExpressJwtConfig,
+  defaultExpressJwtExpiryHandler,
+} from '@lazyapps/tokens/express.js';
 
 const correlationId = (correlationConfig) => (req, res, next) => {
   // check where a correlation Id might already exist
@@ -53,34 +57,13 @@ export const runExpress =
 
       if (jwtSecret) {
         app.use(
-          expressjwt({
-            secret: jwtSecret,
-            algorithms: ['HS256'],
-            // I was tempted to set this to true, but then it
-            // would be impossible to have, e.g., a command that
-            // does not need authentication. So I'll leave this
-            // false by default, and it can be overridden if
-            // a service can only be used by authenticated users.
-            // Must explicitly state `false`.
-            credentialsRequired: credentialsRequired || false,
-            getToken: (req) => {
-              // check Authorization header first
-              if (
-                req.headers.authorization &&
-                req.headers.authorization.split(' ')[0] === 'Bearer'
-              ) {
-                return req.headers.authorization.split(' ')[1];
-              }
-              // consider cookie if a name has been given
-              if (authCookieName) {
-                const token = req.cookies[authCookieName || 'access_token'];
-                if (token) {
-                  return token;
-                }
-              }
-              return null;
-            },
-          }),
+          expressjwt(
+            defaultExpressJwtConfig(
+              jwtSecret,
+              authCookieName,
+              credentialsRequired,
+            ),
+          ),
         );
       }
 
@@ -88,20 +71,21 @@ export const runExpress =
 
       customizeExpress(context, app);
 
+      app.use(defaultExpressJwtExpiryHandler(authCookieName));
       const server = app.listen(port, interfaceIp || '0.0.0.0');
-      server.on('listening', resolve);
-      server.on('error', reject);
-    })
-      .catch((err) => {
-        log.error(`Can't run HTTP server: ${err}`);
-      })
-      .then(() => {
+
+      server.on('error', (err) => {
+        log.error(`Server error: ${err}`);
+        reject(err);
+      });
+      server.on('listening', () => {
+        const addr = server.address();
         log.info(
-          `HTTP API listening on port ${port}, ${
-            jwtSecret && credentialsRequired ? 'requiring ' : 'checking for '
-          } a JWT Bearer token${
-            authCookieName ? ` or a cookie named ${authCookieName}` : ''
+          `Server listening on ${addr.address}:${addr.port}, ${
+            jwtSecret ? 'with JWT' : 'without JWT'
           }`,
         );
+        resolve(server);
       });
+    });
   };

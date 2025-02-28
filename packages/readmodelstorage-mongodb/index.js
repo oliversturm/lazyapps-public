@@ -49,6 +49,12 @@ export const mongodb =
         initLog.error(`Can't connect to MongoDB at ${logLocation}: ${err}`);
       })
       .then((client) => ({ client, db: client.db(database) }))
+      .then((dbcontext) => {
+        initLog.info(
+          `MongoDB connected to url=${logLocation} and database=${database}`,
+        );
+        return dbcontext;
+      })
       .then((dbContext) => ({
         perRequest: (correlationId) => ({
           ...wrapCalls(correlationId, dbContext, [

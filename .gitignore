@@ -156,3 +156,4 @@ logs.txt
 .tmp/
 
 scratch.js
+.DS_Store

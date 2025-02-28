@@ -5,7 +5,7 @@ const createCommandHandler =
   (correlationId) => {
     const log = getLogger('RM/Cmd', correlationId);
     return {
-      execute: (cmd) =>
+      execute: (cmd) => () =>
         new Promise((resolve) => {
           log.debug(`Executing command ${JSON.stringify(cmd)}`);
           resolve();
