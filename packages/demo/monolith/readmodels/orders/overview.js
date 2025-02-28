@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import convert from 'xml-js';
 import {
-  checkOrderValue,
+  checkOrderValueSideEffect,
   confirmationRequestsCollectionName,
 } from './confirmationRequests.js';
 
@@ -27,7 +27,7 @@ const exchangeRateSideEffect = (commands, aggregateId, value) => () =>
         aggregateId,
         command: 'ADD_USD_RATE_AND_VALUE',
         payload: { time, usdRate, usdValue: value * usdRate },
-      }),
+      })(),
     );
 
 const persistInitialOrder = (
@@ -142,7 +142,12 @@ export default {
           aggregateId,
           payload,
           changeNotification,
-        ).then((order) => checkOrderValue(commands, changeNotification, order)),
+        ).then((order) =>
+          sideEffects.schedule(
+            checkOrderValueSideEffect(commands, changeNotification, order),
+            { name: 'Check order value' },
+          ),
+        ),
         sideEffects.schedule(
           exchangeRateSideEffect(commands, aggregateId, payload.value),
           { name: 'Add USD rate and value' },

@@ -5,7 +5,11 @@ export const confirmationRequestsCollectionName =
 
 const expensiveOrderValue = 1000;
 
-export const checkOrderValue = (commands, changeNotification, order) =>
+export const checkOrderValueSideEffect = (
+  commands,
+  changeNotification,
+  order,
+) =>
   order.value > expensiveOrderValue
     ? commands.execute({
         aggregateName: 'order',
