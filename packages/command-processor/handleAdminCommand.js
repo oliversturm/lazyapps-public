@@ -1,15 +1,11 @@
 import { getLogger } from '@lazyapps/logger';
 
-export const handleAdminCommand = (
-  context,
-  command,
-  params,
-  auth,
-  correlationId,
-) => {
+export const handleAdminCommand =
+  (skipAuthCheck = false) =>
+  (context, command, params, auth, correlationId) => {
   const log = getLogger('CP/AdHandler', correlationId);
   // Not very flexible this check, but we'll live with it for now
-  if (!auth || !auth.admin) {
+    if (!skipAuthCheck && (!auth || !auth.admin)) {
     log.error(`Unauthorized ${auth}`);
     return Promise.reject(new Error(`Unauthorized ${auth}`));
   }

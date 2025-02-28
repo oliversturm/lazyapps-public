@@ -35,7 +35,7 @@ const readCommandFile = (filePath) =>
 const replayCommand = async (command, options) => {
   let token = options.token;
 
-  if (command.auth) {
+  if (!options.noAuth && command.auth) {
     if (command.auth.user === options.username) {
       // Case 1: Auth matches current user - use the token we got from the token service
       token = options.token;
@@ -174,6 +174,11 @@ program
     false,
   )
   .option(
+    '-n, --noAuth',
+    'Skip authentication (no username/password query, no token handling)',
+    false,
+  )
+  .option(
     '-j, --jwtsecret <path>',
     'Path to JWT secret file for self-signing tokens',
   )
@@ -196,7 +201,8 @@ const showSummaryAndConfirm = async () => {
   console.log(`Base URL: ${options.url}`);
   console.log(`Delay between commands: ${options.delayBetweenCommands}ms`);
   console.log(`Continue on error: ${options.continueOnError}`);
-  if (options.jwtsecret) {
+  console.log(`Skip authentication: ${options.noAuth}`);
+  if (!options.noAuth && options.jwtsecret) {
     console.log(`JWT Secret File: ${options.jwtsecret}`);
     if (options.issuer) {
       console.log(`Token Issuer: ${options.issuer}`);
@@ -204,8 +210,12 @@ const showSummaryAndConfirm = async () => {
   }
   console.log('----------------------------\n');
 
+  let token, username;
+  if (!options.noAuth) {
   const credentials = await readUserNameAndPassword();
-  const token = await fetchToken(credentials);
+    token = await fetchToken(credentials);
+    username = credentials.username;
+  }
 
   const { confirmed } = await prompt({
     type: 'confirm',
@@ -218,7 +228,7 @@ const showSummaryAndConfirm = async () => {
     process.exit(0);
   }
 
-  return { token, username: credentials.username };
+  return { token, username };
 };
 
 // Main execution

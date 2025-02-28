@@ -26,6 +26,7 @@ export const adminHandler = (context) => (req, res) => {
       res.sendStatus(200);
     })
     .catch((err) => {
-      res.sendStatus(500).send(err);
+      log.error(`Error: ${err}`);
+      res.sendStatus(500);
     });
 };

@@ -4,6 +4,17 @@ import { mongodb } from '@lazyapps/eventstore-mongodb';
 import { rabbitMq } from '@lazyapps/eventbus-rabbitmq/command-receiver/index.js';
 import { start } from '@lazyapps/bootstrap';
 import * as aggregates from './aggregates/index.js';
+import path from 'path';
+const commandRecordingConfig = process.env.COMMAND_RECORD_PATH
+  ? {
+      enabled: true,
+      skipAuthCheck: true,
+      filePath: path.join(
+        process.env.COMMAND_RECORD_PATH,
+        `commands-${new Date().toISOString().replace(/[:.]/g, '-')}.json`,
+      ),
+    }
+  : null;
 
 start({
   correlation: {
@@ -20,5 +31,6 @@ start({
       topic: 'events',
     }),
     aggregates,
+    commandRecording: commandRecordingConfig,
   },
 });

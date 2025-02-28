@@ -39,6 +39,8 @@ services:
       - mongo
       - rabbit
       - dashboard
+    volumes:
+      - ./command-records:/command-records:consistent
     develop:
       watch:
         - action: sync
@@ -49,6 +51,7 @@ services:
       MONGO_URL: 'mongodb://mongo:27017'
       RABBIT_URL: 'amqp://rabbit'
       LOG_LEVEL: 'trace'
+      COMMAND_RECORD_PATH: '/command-records'
 
   readmodel-customers:
     build:
