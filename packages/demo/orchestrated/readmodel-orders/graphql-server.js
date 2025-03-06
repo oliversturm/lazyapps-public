@@ -4,7 +4,7 @@ import { importSchema } from 'graphql-import';
 
 import { getLogger } from '@lazyapps/logger';
 
-const log = getLogger('RM/GraphQL');
+const log = getLogger('RM/GraphQL', 'INIT');
 
 import {
   ordersCollectionName,
@@ -13,12 +13,16 @@ import {
 
 const schema = buildSchema(importSchema('schema.graphql'));
 
-const addDynamicOrdersQuery = (context) => (customers) =>
+const addDynamicOrdersQuery = (outerContext) => (customers) =>
   customers.map((customer) => ({
     ...customer,
-    orders: () => {
+    orders: (args, context) => {
+      const { req } = context;
+      const { correlationId } = req.body;
+      const log = getLogger('RM/GraphQL', correlationId);
+      const storage = outerContext.storage.perRequest(correlationId);
       log.debug(`Querying orders for customer ${customer.id}`);
-      return context.storage
+      return storage
         .find(ordersCollectionName, { customerId: customer.id })
         .project({ _id: 0 })
         .toArray()
@@ -33,39 +37,55 @@ const addUsdInfo = () => (orders) =>
     usdValue: order.usdInfo.value,
   }));
 
-const createRoot = (context) => ({
-  orders: () => {
+const createRoot = (outerContext) => ({
+  orders: (args, context) => {
+    const { req } = context;
+    const { correlationId } = req.body;
+    const log = getLogger('RM/GraphQL', correlationId);
+    const storage = outerContext.storage.perRequest(correlationId);
     log.debug('Querying all orders');
-    return context.storage
+    return storage
       .find(ordersCollectionName, {})
       .project({ _id: 0 })
       .toArray()
       .then(addUsdInfo());
   },
-  order: ({ id }) => {
+  order: ({ id }, context) => {
+    const { req } = context;
+    const { correlationId } = req.body;
+    const log = getLogger('RM/GraphQL', correlationId);
+    const storage = outerContext.storage.perRequest(correlationId);
     log.debug(`Querying order ${id}`);
-    return context.storage
+    return storage
       .find(ordersCollectionName, { id })
       .project({ _id: 0 })
       .toArray()
       .then(addUsdInfo())
       .then((orders) => orders[0]);
   },
-  customers: () => {
+  customers: (args, context) => {
+    const { req } = context;
+    const { correlationId } = req.body;
+    const log = getLogger('RM/GraphQL', correlationId);
+    const storage = outerContext.storage.perRequest(correlationId);
     log.debug('Querying all customers');
-    return context.storage
+    return storage
       .find(customersCollectionName, {})
       .project({ _id: 0 })
       .toArray()
-      .then(addDynamicOrdersQuery(context));
+      .then(addDynamicOrdersQuery(outerContext));
   },
-  customer: ({ id }) => {
+  customer: ({ id }, context) => {
+    const { req } = context;
+    const { correlationId } = req.body;
+    const log = getLogger('RM/GraphQL', correlationId);
+    const storage = outerContext.storage.perRequest(correlationId);
     log.debug(`Querying customer ${id}`);
-    return context.storage
+    return storage
       .find(customersCollectionName, { id })
       .project({ _id: 0 })
       .toArray()
-      .then(addDynamicOrdersQuery(context))
+      .then(addDynamicOrdersQuery(outerContext))
       .then((customers) => customers[0]);
   },
 });
@@ -75,10 +95,11 @@ export const customizeExpress = (context, app) => {
   const rootValue = createRoot(context);
   app.use(
     '/graphql',
-    graphqlHTTP({
+    graphqlHTTP((request) => ({
       schema: schema,
       rootValue,
       graphiql: true,
-    }),
+      context: { req: request },
+    })),
   );
 };
