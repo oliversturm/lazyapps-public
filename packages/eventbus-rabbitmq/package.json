@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@lazyapps/logger": "workspace:^",
-    "amqplib": "^0.10.3",
+    "amqplib": "^0.10.7",
     "p-retry": "^6.1.0"
   },
   "type": "module"
